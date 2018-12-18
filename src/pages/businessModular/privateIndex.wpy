@@ -1,0 +1,132 @@
+<style lang="less">
+.p-private-index {
+  position: relative;
+  padding: 0 40rpx;
+  .p-header {
+    width: 100%;
+    box-sizing: border-box;
+    .p-tab {
+      display: flex;
+      view {
+        flex: 1;
+        height: 120rpx;
+        line-height: 120rpx;
+        font-size: 30rpx;
+        color: #fff8f8;
+        text-align: center;
+        border-radius: 12rpx;
+        background: rgba(10, 1, 1, 0.3);
+        &.active {
+          background: #f55454;
+          margin-right: 10rpx;
+          color: #fff;
+        }
+      }
+    }
+    .p-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin: 60rpx 0;
+      .p-left {
+        display: flex;
+        view {
+          font-size: 28rpx;
+          color: rgba(39, 24, 24, 0.5);
+          margin-left: 30rpx;
+        }
+        .active {
+          color: rgb(39, 24, 24);
+          font-weight: bold;        
+        }
+      }
+      .b-add {
+        width: 40rpx;
+        height: 40rpx;
+        position: relative;
+        &:after,
+        &:before {
+          display: block;
+          content: '';
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        &:after {
+          width: 40rpx;
+          height: 8rpx;
+          background: #190404;
+        }
+        &:before {
+          width: 8rpx;
+          height: 40rpx;
+          background: #190404;
+        }
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-private-index">
+    <view class="p-header">
+      <view class="p-tab">
+        <view class="active">私教模块</view>
+      </view>
+      <view class="p-title">
+        <view class="p-left">
+          <view class="active">教练模块</view>
+          <view @tap="jumpToCourseModular">课程模块</view>
+        </view>
+        <view class="b-add" @tap="handleAdd"></view>
+      </view>
+    </view>
+    <coachlist></coachlist>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+import coachList from '@/components/coachList';
+
+export default class privateIndex extends wepy.page {
+  config = {
+    navigationBarTitleText: '私教模块'
+  };
+  components = {
+    coachlist: coachList,//私教课教练列表
+  };
+
+  data = {
+    storeId: "",
+    token: "",
+  };
+
+  computed = {};
+
+  methods = {
+    handleAdd() {
+      wepy.navigateTo({
+        url: `coachAdd?modularType=${this.tabNav}`
+      });
+    },
+    jumpToCourseModular() {
+      wepy.navigateTo({
+        url: 'courseModular'
+      });
+    },
+  };
+
+  events = {};
+
+  onLoad() {
+
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+
+  }
+}
+</script>

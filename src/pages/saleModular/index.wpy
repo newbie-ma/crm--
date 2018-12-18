@@ -1,0 +1,329 @@
+<style lang="less">
+.p-boss-index {
+  position: relative;
+  height: 100vh;
+  .p-header {
+    padding: 0 40rpx;
+    width: 100%;
+    box-sizing: border-box;
+    .p-search {
+      display: flex;
+      align-items: center;
+      input {
+        flex: 1;
+        background: #e7e7e8;
+        height: 48rpx;
+        line-height: 48rpx;
+        font-size: 36rpx;
+        padding: 10rpx;
+        margin-right: 20rpx;
+        border-radius: 8rpx;
+      }
+      label {
+        font-size: 40rpx;
+        color: #707070;
+      }
+    }
+    .p-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 30rpx 0;
+      .p-h1 {
+        font-size: 57rpx;
+        color: rgba(10, 1, 1, 0.8);
+      }
+      .b-add {
+        color: #190404;
+        font-size: 56rpx;
+        font-weight: bold;
+      }
+    }
+  }
+  .p-sale-list {
+    .p-sale-con {
+      width: 100vw;
+      position: relative;
+      z-index: 99;
+      .p-c-name {
+        font-weight: bold;
+        width: 220rpx;
+      }
+      .p-c-gender {
+        width: 200rpx;
+      }
+      .p-c-phone {
+        flex: 1;
+        text-align: right;
+      }
+      movable-area {
+        height: 80rpx;
+        width: calc(~'100vw - 90rpx');
+        movable-view {
+          height: 80rpx;
+          width: 100vw;
+          z-index: 99;
+        }
+      }
+      &:nth-child(odd) {
+        .p-sale-info {
+          background: #fcfcfc;
+        }
+      }
+      .p-sale-info {
+        position: relative;
+        display: flex;
+        padding: 0 40rpx;
+        box-sizing: border-box;
+        font-size: 36rpx;
+        color: #707070;
+        height: 80rpx;
+        align-items: center;
+        justify-content: space-between;
+        background: #FFF;
+        z-index: 9;
+      }
+      .p-delete {
+        position: absolute;
+        right: 0;
+        top: 0;
+        background: #f55454;
+        width: 90rpx;
+        height: 80rpx;
+        line-height: 80rpx;
+        z-index: 1;
+        color: #fff;
+        text-align: center;
+        font-size: 30rpx;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-boss-index">
+    <view class="p-header">
+      <view class="p-search">
+        <input type="text" value="{{searchVal}}" @input="searchFun" />
+        <label @tap="btnSearch">搜索</label>
+      </view>
+      <view class="p-title">
+        <view class="p-h1">销售员列表</view>
+        <view class="b-add" @tap="btnAdd">+</view>
+      </view>
+    </view>
+    <view class="p-sale-list">
+      <view
+        class="p-sale-con"
+        wx:for="{{saleManList}}"
+        wx:key="{{ index }}"
+        @tap="btnDetail({{index}},{{item.userId}})"
+      >
+        <movable-area>
+          <movable-view
+            out-of-bounds="true"
+            direction="horizontal"
+            x="{{item.xMove}}"
+            inertia="true"
+            data-productindex="{{index}}"
+            bindtouchstart="handleTouchStart"
+            bindtouchend="handleTouchEnd"
+            bindchange="handleMovableChange">
+            <view class="p-sale-info">
+              <view class="p-c-name">{{ item.name }}</view>
+              <view class="p-c-gender">{{ genderData[item.sex-1]}}</view>
+              <view class="p-c-phone">{{ item.mobile }}</view>
+            </view>   
+          </movable-view>
+        </movable-area>
+        <view class="p-delete" catchtap="handleDelete({{index}},{{item.userId}})">删除</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class saleModularIndex extends wepy.page {
+  config = {
+    navigationBarTitleText: '销售员列表'
+  };
+  components = {};
+
+  data = {
+    searchVal: "",
+    navActive: '0',
+    startX: 0,
+    startY: 0,
+    genderData: ["男","女"],
+    saleManList: [],
+    storeId: "",
+    token: "",
+  };
+
+  computed = {};
+
+  methods = {
+    searchFun(e) {
+      this.searchVal = e.detail.value;
+    },
+    btnSearch() {
+      console.log('hah，我是搜索按钮！');
+      this.getSalerList(this.storeId,this.searchVal);
+    },
+    btnAdd() {
+      console.log('hah,我要添加新用户了！');
+      wepy.navigateTo({
+        url: "add",
+      });
+    },
+    btnDetail(m,n) {//m:当前列的index、n:当前列的userId；
+
+        wepy.navigateTo({
+          url: `detail?salemanid=${n}`,
+        });  
+
+    },
+    handleDelete(m,n) {//m:当前列的index、n:当前列的userId；
+      console.log(m);
+      var self = this;
+      wx.showModal({
+        title: "删除",
+        content: "删除该销售员",
+        success(res) {
+          if(res.confirm) {//点击确定；
+            var request = api.deleteCrmUser({
+              header: {
+                'content-type': 'application/json',
+                token: self.token
+              },
+              method: 'POST',
+              data: {
+                userId: n,
+              }
+            });
+            request.then(res => {
+              let result = res.data.body;
+              if(result.res == "true") {
+                wepy.showToast({
+                  title: result.msg,
+                  icon: "success",
+                  duration: 2000,
+                });
+                self.saleManList.splice(m,1);//从列表将改销售员去掉；
+                self.$apply();
+              } else {
+                wepy.showToast({
+                  title: "此销售有用户信息未转移，无法删除",
+                  icon: "none",
+                  duration: 2000,
+                });
+              }
+            });        
+          };
+        },
+      });
+      
+    },
+    handleTouchStart(e) {
+      //开始滑动时位置初始化；
+      this.saleManList.forEach(function(v, i) {
+        if (v.xMove != 0)
+          //只操作为true的
+          v.xMove = 0;
+      });
+      this.startX = e.touches[0].pageX;
+      this.$apply();
+    },
+    handleTouchEnd(e) {
+      if (e.changedTouches[0].pageX < this.startX && e.changedTouches[0].pageX - this.startX <= -30) {
+
+        this.showDeleteButton(e);
+
+      } else if (e.changedTouches[0].pageX > this.startX && e.changedTouches[0].pageX - this.startX < 30) {
+
+        this.showDeleteButton(e);
+
+      } else {
+
+        this.hideDeleteButton(e);
+
+      }
+    },
+    handleMovableChange(e) {
+      if (e.detail.source === 'friction') {
+        if (e.detail.x < -30) {
+          this.showDeleteButton(e)
+        } else {
+          this.hideDeleteButton(e)
+        }
+      } else if (e.detail.source === 'out-of-bounds' && e.detail.x === 0) {
+        this.hideDeleteButton(e)
+      }
+    }
+  };
+
+  /**
+   * 显示删除按钮
+   */
+  showDeleteButton(e) {
+    let productIndex = e.currentTarget.dataset.productindex;
+    this.setXmove(productIndex, -45);
+  }
+
+  /**
+   * 隐藏删除按钮
+   */
+  hideDeleteButton(e) {
+    let productIndex = e.currentTarget.dataset.productindex;
+
+    this.setXmove(productIndex, 0);
+  }
+
+  /**
+   * 设置movable-view位移
+   */
+  setXmove(productIndex, xmove) {
+    let productList = this.saleManList;
+    productList[productIndex].xMove = xmove;
+    this.saleManList = productList;
+  }
+  
+  getSaleManList(mobile) {//获取销售员列表
+    var request = api.getCrmUserList({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        storeId: this.storeId,
+        mobile: mobile?mobile:"",
+      }
+    });
+    request.then(res => {
+      console.log(res);
+      let result = res.data.body;
+      this.saleManList = result;
+      this.saleManList.forEach(function(v, i) {
+        //位置初始化
+        v.xMove = 0;
+      });
+      this.$apply();
+      console.log(this.saleManList);
+    });
+  };
+  onShow() {
+    this.getSaleManList();
+  };
+  events = {};
+
+  onLoad() {
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.getSaleManList();
+  }
+}
+</script>

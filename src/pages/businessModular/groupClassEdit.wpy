@@ -1,0 +1,387 @@
+<style lang="less">
+.p-groupclass-edit {
+  position: relative;
+  height: 100vh;
+  padding: 0 40rpx;
+  .p-header {
+    display: flex;
+    margin-top: 70rpx;
+    .p-h1 {
+      width: 300rpx;
+      font-size: 50rpx;
+      color: #0A0101;
+      padding: 10rpx;
+      border-bottom: 1rpx solid #f55454;
+    }
+    .p-p {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-top: 45rpx;
+      display: flex;
+      align-items: center;
+      input {
+        display: inline-block;
+        border-bottom: 1px solid #f55454;
+        width: 60rpx;
+        text-align: center;
+        color: #f55454
+      }
+    }
+  }
+  .p-section {
+    margin: 45rpx 0;
+    .p-title {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-bottom: 24rpx;
+    }
+  }
+  .p-section-1 {
+    margin: 45rpx 0;
+    .p-title {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+    }
+    display: flex;
+    align-items: center;
+    .p-class-time {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #f55454;
+      picker {
+        font-size: 50rpx;
+        border-bottom: 1rpx solid #f55454;
+      }
+      view {
+        margin: 0 15rpx;
+      }
+    }
+  }
+  .p-section-2 {
+    position: relative;
+    .p-explain {
+      font-size: 28rpx;
+      color: #271818;
+      line-height: 40rpx;
+      padding: 0 15rpx;
+      textarea {
+        border: 1rpx solid #707070;
+        padding: 10rpx;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 8rpx;
+      }
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    .p-class-show {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 0 60rpx;
+      view {
+        margin-bottom: 20rpx;
+        image {
+          width: 260rpx;
+          height: 215rpx;
+        }
+      }
+      .p-upload {
+        width: 260rpx;
+        height: 215rpx;
+        position: relative;
+        background: #8f8d8d;
+        &:after,
+        &:before {
+          display: block;
+          content: '';
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          background: #fff;
+          transform: translate(-50%, -50%);
+        }
+        &:after {
+          width: 45rpx;
+          height: 6rpx;
+        }
+        &:before {
+          width: 6rpx;
+          height: 45rpx;
+        }
+      }
+    }
+  }
+  .p-fixed {
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+    margin: 50rpx 0;
+    z-index: 9;
+    .p-btn {
+      width: 262rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 70rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-groupclass-edit">
+    <view class="p-header">
+      <view class="left">
+        <view class="p-h1"><input type="text" value="{{ leagueName }}" @input="handleNameVal"/></view>
+        <view class="p-p">可预约人数：<input value="{{peopleNumber}}" @input="handleNumberPeople" />人</view>
+      </view>
+    </view>
+    <view class="p-section-1">
+      <view class="p-title">上课时间：</view>
+      <view class="p-class-time">
+        <picker value="{{startTime}}" mode="time" @change="bindStartTime">{{startTime}}</picker>
+        <view>-</view>
+        <picker value="{{endTime}}" mode="time" @change="bindEndTime">{{endTime}}</picker>
+      </view>
+    </view>
+    <view class="p-section p-section-2">
+      <view class="p-title">课程介绍</view>
+      <view class="p-explain">
+        <textarea value="{{areaVal}}" @input="handleArea"></textarea>
+      </view>
+    </view>
+    <view class="p-section p-section-3">
+      <view class="p-title">课程展示</view>
+      <view class="p-class-show">
+        <view wx:for="{{ imgShowData }}" wx:key="{{index}}" @tap="handleDeleteShow({{index}})">
+          <image src="{{ BASEURL+'downloadCrm.do?ossId='+item }}" mode="aspectFill" />
+        </view>
+        <view class="p-upload"  @tap="handleUpload"></view>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class groupClassEdit extends wepy.page {
+  config = {
+    navigationBarTitleText: '团课课程编辑'
+  };
+  components = {};
+
+  data = {
+    BASEURL: "",//请求基础地址
+    storeId: "",
+    leagueId: "",
+    leagueName: "",
+    peopleNumber: "",
+    startTime: "",
+    endTime: "",
+    areaVal: "",//课程介绍
+    imgShowData: [],//课程展示
+    
+  };
+
+  computed = {};
+
+  methods = {
+    handleNameVal(e) {
+      this.leagueName = e.detail.value;
+    },
+    handleNumberPeople(e) {
+      this.peopleNumber = parseInt(e.detail.value);
+    },
+    handleArea(e) {
+      this.areaVal = e.detail.value;
+    },
+    bindStartTime(e) {
+      this.startTime = e.detail.value;
+    },
+    bindEndTime(e) {
+      this.endTime = e.detail.value;
+    },
+    handleDeleteShow(m) {
+      var self = this;
+      wx.showModal({
+        title: "删除",
+        content: "删除该条课程展示",
+        success(res) {
+          if(res.confirm) {
+            self.imgShowData.splice(m,1);
+            self.$apply();
+          }
+        },
+      })
+    },
+    handleUpload() {//上传课程展示~
+      var self = this;
+      self.upLoad().then(res => {
+        if(res) {
+          self.imgShowData.push(res);
+          self.$apply();
+        }
+      });
+    },
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      });
+    },
+    btnSure() {
+      if(this.checkVal()) {
+        this.getClassEdit();
+      }
+    }
+  };
+  upLoad() {//执行上传功能，根据需要返回相应的参数
+    return new Promise(function(resolve, reject){
+      wx.chooseImage({
+        count: 1,
+        sizeType: ['original', 'compressed'],
+        sourceType: ['album', 'camera'],
+        success (res){
+          // tempFilePath可以作为img标签的src属性显示图片    
+          let tempFilePaths = res.tempFilePaths;
+          wx.uploadFile({
+            url: `${api.BASE_URL}uploadCrm.do`, //上传地址
+            filePath: tempFilePaths[0],
+            name: "file", 
+            success(res){
+              if(res.statusCode == 200) {
+                let result = JSON.parse(res.data);//data为对象字符串
+                let ossId = result.body;
+                resolve(ossId);
+              }
+            }
+          })
+        }
+      });
+    });    
+  };
+  getClassEdit() {
+    // let showImg = this.imgShowData.toString();//两者都可
+    let showImg = this.imgShowData.join(",") + ",";
+    var data = {
+      leagueName: this.leagueName,
+      peopleNumber: this.peopleNumber,
+      startTime: "2018-12-09 "+ this.startTime +":00",
+      endTime: "2018-12-09 "+ this.endTime +":00",
+      content: this.areaVal,
+      showImg: showImg,
+      storeId: this.storeId,
+      leagueId: this.leagueId,
+    };
+    var request = api.updateCrmOperateLeague({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: data,
+    });
+    request.then(res => {
+      let result = res.data.body;
+      if(result.res == "true") {
+        wepy.showToast({
+          title: result.msg,
+          icon: "success",
+          duration: 2000,
+        });
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1
+          })
+        }, 2000);
+      } else {
+        wepy.showToast({
+          title: result.msg,
+          icon: "none",
+          duration: 2000,
+        });
+      }
+    });
+  };
+  getClassDetail() {
+    var request = api.getCrmOperateLeague({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        leagueId: this.leagueId
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      this.peopleNumber = result.peopleNumber;
+      this.areaVal = result.content;
+      this.leagueName = result.leagueName;
+      this.startTime = result.startTime;
+      this.endTime = result.endTime;
+      this.imgShowData = result.showImg.split(",");
+      this.$apply();
+    });
+  };
+  checkVal() {
+    if(this.leagueName == "") {
+      wepy.showToast({
+        title: '请输入课程名称',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if(this.peoplenumVal == "") {
+      wepy.showToast({
+        title: '请输入可预约人数',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if(this.areaVal == "") {
+      wepy.showToast({
+        title: '请输入课程介绍',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if(this.imgShowData<=0) {
+      wepy.showToast({
+        title: '请上传课程展示图例',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else {
+      return true;
+    }
+  };
+  events = {};
+
+  onLoad(option) {
+
+    this.BASEURL = api.BASE_URL;
+    this.storeId = this.$parent.globalData.storeId;
+    this.leagueId = parseInt(option.leagueId);
+    this.getClassDetail();
+    
+  }
+}
+</script>

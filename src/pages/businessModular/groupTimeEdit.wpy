@@ -1,0 +1,410 @@
+<style lang="less">
+.p-grouptime-add {
+  position: relative;
+  height: 100vh;
+  padding: 0 40rpx;
+  .hide {
+    display: none;
+  }
+  .show {
+    display: block;
+  }
+  .p-day-list {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(10, 4, 17, 0.4);
+    margin-bottom: 30rpx;
+    view {
+      font-size: 30rpx;
+      font-weight: bold;
+      &.active {
+        color: #f55454;
+      }
+    }
+  }
+  .p-section-1 {
+    .p-title {
+      font-size: 45rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-top: 30rpx;
+      margin-bottom: 16rpx;
+    }
+    .p-class-list {
+      display: flex;
+      flex-wrap: wrap;
+      view {
+        width: 208rpx;
+        height: 90rpx;
+        line-height: 90rpx;
+        font-size: 28rpx;
+        text-align: center;
+        border-radius: 12rpx;
+        color: rgba(10, 1, 1, 0.6);
+        background: rgba(94, 93, 93, 0.1);
+        margin-right: 23rpx;
+        margin-bottom: 10rpx;
+        &:nth-child(3n) {
+          margin-right: 0;
+        }
+        &.active {
+          background: #f55454;
+          color: #fff;
+        }
+      }
+    }
+  }
+  .p-section-2 {
+    margin-top: 40rpx;
+    margin-bottom: 40rpx;
+    .p-title {
+      font-size: 45rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-bottom: 16rpx;
+    }
+    .p-class-time {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #f55454;
+      margin: 30rpx 0;
+      picker {
+        font-size: 60rpx;
+      }
+      view {
+        margin: 0 15rpx;
+      }
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    .p-title {
+      font-size: 45rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-bottom: 16rpx;
+    }
+    .p-swiper-container {
+      position: relative;
+      .p-button-prev,
+      .p-button-next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        image {
+          width: 34rpx;
+          height: 34rpx;
+        }
+      }
+      .p-button-prev {
+        left: 0;
+      }
+      .p-button-next {
+        right: 0;
+      }
+      swiper-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .p-coash-head {
+        position: relative;
+        width: 164rpx;
+        height: 164rpx;
+        border: 3rpx solid #707070;
+        border-radius: 50%;
+        // overflow: hidden;
+        margin-bottom: 10rpx;
+        box-sizing: border-box;
+        &.active {
+          border: 3rpx solid #f55454;
+        }
+        image {
+          width: 164rpx;
+          height: 164rpx;
+          border-radius: 50%;
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+        .p-tip {
+          position: absolute;
+          bottom: 40rpx;
+          right: 40rpx;
+          image {
+            width: 49rpx;
+            height: 49rpx;
+          }
+        }
+      }
+    }
+  }
+  .p-fixed {
+    // position: fixed;
+    //  width: 100%;
+    // bottom: 70rpx;
+    // left: 0;
+    // padding: 0 40rpx;
+    margin: 80rpx 0 60rpx;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    z-index: 9;
+    .p-btn {
+      width: 262rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 70rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-grouptime-add">
+    <view class="p-day-list">
+      <view wx:for="{{ weekData }}" :class="{'active': weekNav == index }" wx:key="{{index}}" @tap="handleWeek({{index}})">
+        <view>{{ item }}</view>
+      </view>
+    </view>
+    <view class="p-section-1">
+      <view class="p-title">添加课程</view>
+      <view class="p-class-list">
+        <view
+          :class="{active: classIndex == index}"
+          wx:for="{{groupClassList}}"
+          wx:key="{{index}}"
+          @tap="handleAddClass({{ index }})"
+        >{{ item.leagueName }}</view>
+      </view>
+    </view>
+    <view class="p-section-2">
+      <view class="p-title">课程时间</view>
+      <view class="p-class-time">
+        <picker value="{{startTime}}" mode="time" @change="bindStartTime">{{startTime}}</picker>
+        <view>-</view>
+        <picker value="{{endTime}}" mode="time" @change="bindEndTime">{{endTime}}</picker>
+      </view>
+    </view>
+    <view class="p-section-3">
+      <view class="p-title">更换教练</view>
+      <view class="p-swiper-container">
+        <swiper
+          indicator-dots="{{indicatorDots}}"
+          autoplay="{{autoplay}}"
+          interval="{{interval}}"
+          duration="{{duration}}"
+          display-multiple-items="2"
+          bindchange="handleSwiperChange"
+          current="{{current}}"
+        >
+          <swiper-item
+            wx:for="{{coachList}}"
+            wx:key="{{index}}"
+            @tap="handleSwiperIndex({{ index }})"
+          >
+            <view class="p-coash-head" :class="{active: coachIndex == index}">
+              <image src="{{ BASEURL+'downloadCrm.do?ossId='+item.coachImg}}" mode="aspectFill"/>
+              <view class="p-tip {{coachIndex == index?'show':'hide'}}" >
+                <image src="{{imgTip}}" mode="aspectFill"/>
+              </view>
+            </view>
+            <view>{{item.coachName}}</view>
+          </swiper-item>
+        </swiper>
+        <view class="p-button-prev" @tap="btnPrev">
+          <image src="{{iconPrev}}"/>
+        </view>
+        <view class="p-button-next" @tap="btnNext">
+          <image src="{{iconNext}}"/>
+        </view>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+import date from '@/utils/date.js';
+
+export default class groupTimeAdd extends wepy.page {
+  config = {
+    navigationBarTitleText: '团课课程安排'
+  };
+  components = {};
+
+  data = {
+    BASEURL: "",//请求基础地址
+    storeId: "",
+    token: "",
+    week: "",//用来表明当天的变量
+    weekNav: "",//用来代表选择周几的变量
+    coachLeagueId: "",
+    weekData: ['周一','周二','周三','周四','周五','周六','周日'],
+    classIndex: 0,
+    startTime: '',
+    endTime: '',
+    groupClassList: [],//获取团课列表
+    coachList: [],//教练列表
+    indicatorDots: false,
+    autoplay: false,
+    interval: 3000,
+    duration: 500,
+    current: 0,
+    iconPrev: '../../images/icon-prev.png',
+    iconNext: '../../images/icon-next.png',
+    imgTip: '../../images/icon-tip.png',
+    coachIndex: 0,//教练的index
+    coachId: "",//匹配教练id
+    leagueId: "",//匹配课程id
+    coachLeagueId: ""//团课课表id
+  };
+
+  computed = {};
+
+  methods = {
+    handleWeek(m) {
+      console.log(m);
+      this.weekNav = parseInt(m);
+    },
+    handleAddClass(m) {//课程选择
+      console.log(m);
+      this.classIndex = m;
+      this.startTime = this.groupClassList[m].startTime;
+      this.endTime = this.groupClassList[m].endTime;
+    },
+    bindStartTime(e) {
+      this.startTime = e.detail.value;
+    },
+    bindEndTime(e) {
+      this.endTime = e.detail.value;
+    },
+    handleSwiperChange(e) {//滑动更新current
+      this.current = e.detail.current;
+    },
+    handleSwiperIndex(m) {
+      //点击swiper获取index
+      console.log(m);
+      this.coachIndex = m;
+      console.log("您选择的教练:" + this.coachIndex);
+    },
+    btnPrev() {//上一个
+      let currentIndex = this.current;
+      this.current=currentIndex>0?currentIndex-1:0;
+    },
+    btnNext() {//下一个
+      let currentIndex = this.current;
+      this.current=currentIndex+1<this.coachList.length-1?currentIndex+1:currentIndex;
+    },
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      });
+    },
+    btnSure() {
+      console.log('哦吼！您点击了确定！');
+    }
+  };
+  getTimeDetail() {
+    var request = api.getCrmOperateCoachLeague({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        coachLeagueId: this.coachLeagueId
+      }
+    });
+    request.then(res => {
+      console.log(res);
+      let result = res.data.body;
+      this.coachId = result.coachId;
+      this.leagueId = result.leagueId;
+      this.weekNav = result.week-1;
+      this.startTime = result.startTime;
+      this.endTime = result.endTime;
+      this.$apply();
+    });
+  };
+  getCoachList() {//获取教练列表跟课表的教练匹配
+    var request = api.getCrmOperateCoachList({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        storeId: this.storeId,
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      this.coachList = result;
+      this.coachList.forEach((ele,index) => {
+        if(this.coachId == ele.coachId) {
+          this.coachIndex = index;
+        }
+      });
+      this.$apply();
+    })
+  };
+  getClassList() {//获取课程列表跟课表的课程匹配
+    var request = api.getCrmOperateLeagueStore({
+      header: {
+        'content-type': 'application/json',
+        token: this.token 
+      },
+      method: 'POST',
+      data: {
+        storeId: this.storeId,
+      }
+    });
+    request.then(res => {
+      console.log(res);
+      let result = res.data.body;
+      this.groupClassList = result;
+      this.groupClassList.forEach((ele,index) => {
+        if(this.leagueId == ele.leagueId) {
+          this.classIndex = index;
+          this.current = index-1;
+        }
+      });
+      this.$apply();
+    })
+  };
+  events = {};
+  
+  onLoad(option) {
+
+    this.BASEURL = api.BASE_URL;
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.coachLeagueId = parseInt(option.coachLeagueId);
+    this.week = date.formatWeek(new Date());
+    if(this.week == 0) {
+      this.week = 7
+    };
+    this.weekNav = this.week - 1;
+    this.weekData[this.week-1] = "今天";
+    
+    this.getTimeDetail();//获取相应课程的详情
+    this.getClassList();//获取团课列表
+    this.getCoachList();//获取教练列表
+    
+    
+  }
+}
+</script>

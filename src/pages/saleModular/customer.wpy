@@ -1,0 +1,629 @@
+<style lang="less">
+.p-staff-index {
+  position: relative;
+  height: 100vh;
+  .hide {
+    display: none;
+  }
+  .show {
+    display: block;
+  }
+  .p-header {
+    padding: 0 40rpx;
+    width: 100%;
+    box-sizing: border-box;
+    .p-search {
+      display: flex;
+      align-items: center;
+      input {
+        flex: 1;
+        background: #e7e7e8;
+        height: 48rpx;
+        line-height: 48rpx;
+        font-size: 36rpx;
+        padding: 10rpx;
+        margin-right: 20rpx;
+        border-radius: 9rpx;
+      }
+      label {
+        font-size: 40rpx;
+        color: #707070;
+      }
+    }
+    .p-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30rpx;
+      .p-nav-li {
+        font-size: 36rpx;
+        padding: 10rpx 24rpx;
+        background: #e7e7e8;
+        color: #707070;
+        border-radius: 10rpx;
+        font-weight: bold;
+        &.active {
+          background: green;
+          color: #fff;
+        }
+      }
+    }
+    .p-custom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 40rpx;
+      font-weight: bold;
+      .p-left {
+        font-size: 36rpx;
+        color: #707070;
+      }
+      .b-transfer {
+        color: #888888;
+        font-size: 36rpx;
+      }
+      .p-right {
+        display: flex;
+        font-size: 24rpx;
+        view {
+          padding-left: 30rpx;
+          color: #ccc;
+          &.active {
+            color: #f55454;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+  .p-custom-list {
+    margin-top: 16rpx;
+    .p-custom-wrap {
+      position: relative;
+      width: 100vw;
+      z-index: 99;
+      movable-area {
+        height: 80rpx;
+        width: calc(~'100vw - 90rpx');
+        movable-view {
+          height: 80rpx;
+          width: 100vw;
+          z-index: 99;
+        }
+      }
+      &:nth-child(odd) {
+        .p-custom-con {
+          background: #fcfcfc;
+        } 
+      }
+      .p-custom-con {
+        display: flex;
+        align-items: center;
+        padding: 0 40rpx;
+        height: 80rpx;
+        font-size: 36rpx;
+        color: #707070;
+        background: #FFF;
+      }
+      .p-c-info {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        .p-c-name {
+          font-weight: bold;
+          width: 250rpx;
+        }
+        .p-c-gender {
+          width: 200rpx;
+        }
+        .p-c-phone {
+          flex: 1;
+          text-align: right;
+        }
+      }
+      .p-c-check {
+        .p-c-name {
+          font-weight: bold;
+          width: 190rpx;
+        }
+        .p-c-gender {
+          width: 100rpx;
+        }
+        .p-c-phone {
+          flex: 1;
+          text-align: right;
+        }
+      }
+      .p-delete {
+        position: absolute;
+        right: 0;
+        top: 0;
+        background: #f55454;
+        width: 90rpx;
+        height: 80rpx;
+        line-height: 80rpx;
+        z-index: 1;
+        color: #fff;
+        text-align: center;
+        font-size: 30rpx;
+      }
+    }
+  }
+  .p-model-mask {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    .p-pop {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      width: 360rpx;
+      text-align: center;
+      .p-pop_top {
+        font-size: 36rpx;
+        color: #f8f8f8;
+        background: #3a3838;
+        padding: 6rpx 0;
+      }
+      .p-pop_con {
+        max-height: 480rpx;
+        overflow: auto;
+        view {
+          height: 80rpx;
+          line-height: 80rpx;
+          background: #cfcfcf;
+          &:nth-child(odd) {
+            background: #fff;
+          }
+          &.active {
+            background: #F55454;
+          }
+        }
+      }
+      .p-pop_btn {
+        display: flex;
+        margin-top: 60rpx;
+        justify-content: space-between;
+        view {
+          width: 150rpx;
+          height: 60rpx;
+          line-height: 60rpx;
+          font-size: 32rpx;
+          color: #fff;
+          text-align: center;
+          background: #878585;
+          border-radius: 6rpx;
+          &:first-child {
+            background: #f55454;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-staff-index">
+    <view class="p-header">
+      <view class="p-search">
+        <input type="text" value="{{searchVal}}" @input="searchFun"/>
+        <label @tap="btnSearch">搜索</label>
+      </view>
+      <view class="p-nav">
+        <view class="p-nav-li" :class="{active: navActive == 0}" @tap="btnNav(0)">全部</view>
+        <view class="p-nav-li" :class="{active: navActive == 1}" @tap="btnNav(1)">1类</view>
+        <view class="p-nav-li" :class="{active: navActive == 2}" @tap="btnNav(2)">2类</view>
+        <view class="p-nav-li" :class="{active: navActive == 3}" @tap="btnNav(3)">3类</view>
+        <view class="p-nav-li" :class="{active: navActive == 4}" @tap="btnNav(4)">4类</view>
+      </view>
+      <view class="p-custom">
+        <view class="p-left">用户列表</view>
+        <view class="b-transfer {{isTransfer?'show':'hide'}}" @tap="handleToTransfer()">转移</view>
+        <view class="{{!isTransfer?'show':'hide'}}">
+          <view class="p-right">
+            <view class="{{isNext?'active':''}}" @tap="handleAllSelected">{{selectedTxt}}</view>
+            <view class="{{!isNext?'active':''}}" @tap="handleNextStep">下一步</view>
+            <view class @tap="handleClose">取消</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="p-custom-list">
+      <checkbox-group bindchange="checkboxChange">
+        <view
+          class="p-custom-wrap"
+          wx:for="{{customerList}}"
+          wx:key="{{ index }}"
+          @tap="handleToDetail({{ item.clientId }})"
+        >
+          <movable-area>
+            <movable-view
+              out-of-bounds="true"
+              direction="horizontal"
+              x="{{item.xMove}}"
+              inertia="true"
+              disabled="{{!isTransfer}}"
+              data-productindex="{{index}}"
+              bindtouchstart="handleTouchStart"
+              bindtouchend="handleTouchEnd"
+              bindchange="handleMovableChange"
+              >
+              <view class="p-custom-con">
+                <view class="{{!isTransfer?'show':'hide'}}">
+                  <checkbox value="{{index}}" checked="{{item.checked}}"/>
+                </view>
+                <view class="p-c-info {{!isTransfer?'p-c-check':''}}">
+                  <view class="p-c-name">{{ item.name }}</view>
+                  <view class="p-c-gender">{{ genderData[item.sex-1] }}</view>
+                  <view class="p-c-phone">{{ item.mobile }}</view>
+                </view>
+              </view>
+            </movable-view>
+          </movable-area>
+          <view class="p-delete" catchtap="handleDelete({{index}},{{item.clientId}})">删除</view>
+        </view>
+      </checkbox-group>
+    </view>
+    <!-- 转移销售员弹出框 -->
+    <view class="p-model-mask {{popupVisible?'show':'hide'}}">
+      <view class="p-pop">
+        <view class="p-pop_top">销售员列表</view>
+        <view class="p-pop_con">
+          <view wx:for="{{saleManList}}" :class="{'active': saleManIndex == index }" wx:key="{{index}}" @tap="handleSelectedSale({{index}},{{ item.userId }})">{{item.name}}</view>
+        </view>
+        <view class="p-pop_btn">
+          <view @tap="handleCancle">取消</view>
+          <view @tap="handleSure">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class saleModularIndex extends wepy.page {
+  config = {
+    navigationBarTitleText: '客户'
+  };
+  components = {};
+
+  data = {
+    storeId: "",
+    token: "",
+    userId: "",//查询销售员的客户列表userId
+    targetUserId: "",//转移目标销售员的userId;
+    navActive: 0,
+    genderData: ["男","女"],
+    isTransfer: true,//是否进行转移操作
+    isAllSelected: true,//全选标记
+    selectedTxt: '全选',
+    isNext: true,//是否进行下一步；
+    selectedList: [],//要转移的用户id
+    customerList: [],//用户列表
+    saleManList: [],//销售员列表
+    saleManIndex: 0,//当前选择的销售员index
+    popupVisible: false,
+    deleteIndexList: [],//需要删除的用户index列表 
+  };
+
+  computed = {};
+
+  methods = {
+    searchFun(e) {
+      this.searchVal = e.detail.value;
+    },
+    btnSearch() {
+      this.getCustomerList(this.navActive,this.searchVal);
+    },
+    btnNav(index) {
+      this.navActive = parseInt(index);
+      this.getCustomerList(this.navActive);
+    },
+    handleToTransfer() {//点击转移用户；
+      this.isTransfer = false;
+      this.customerList.forEach(function(v, i) {
+        if (v.xMove != 0) {
+          //位置初始化
+          v.xMove = 0;
+        };
+        //列表均为未选择状态；
+        v.checked = false;  
+      });
+      this.$apply();
+    },
+    handleAllSelected() {//是否全选根据customerList的checked状态
+
+      var self = this;
+      this.isNext = true;
+      
+      if(this.selectedList.length != this.customerList.length) {//说明要全选
+
+        this.selectedList = [];
+        this.customerList.forEach((item, index) => {
+            item.checked = true;   
+            self.selectedList.push(item.clientId); 
+            this.$apply();
+        });
+
+        this.isAllSelected = false;   
+        this.selectedTxt = '全不选';        
+        this.$apply();
+
+      } else {//再次点击全不选；
+
+        this.selectedTxt = '全选';
+        this.isAllSelected = true;
+        this.customerList.forEach((item, index) => {
+          item.checked = false;
+        });
+
+        this.selectedList = [];
+        this.$apply();
+      }
+    },
+    handleNextStep() {
+      //点击下一步,只有列表有值才执行；
+      if(this.selectedList.length>0) {
+        this.isNext = false;
+        this.popupVisible = true;
+        this.getSaleManList();
+      }; 
+    },
+    handleClose() {//取消时，初始化选择状态；
+      this.customerList.forEach((item, index) => {
+        item.checked = false;
+      });
+      this.selectedList = [];
+      this.isAllSelected = true;
+      this.isNext = true;
+      this.isTransfer = true;
+      this.$apply();
+    },
+    handleToDetail(m) {//携带用户id跳转
+      if (this.isTransfer) {
+        wepy.navigateTo({
+          url: `../staff/detail?clientId=${m}`,
+        });
+      }
+    },
+    /** 
+     * 需要将checkbox的值要跟用户列表的checked状态关联
+    */
+    checkboxChange(e) {
+
+      this.deleteIndexList = e.detail.value;//选中的checkbox的value的数组(用户列表的index)
+      
+      var self = this;
+      var length = this.customerList.length;
+      if (e.detail.value.length != length) {
+        this.selectedTxt = '全选';
+        this.isAllSelected = false;
+        this.customerList.forEach( ele => {
+          ele.checked = false;
+        });
+        e.detail.value.forEach( ele => {
+          self.customerList[ele].checked = true;
+        });
+      } else {
+        this.selectedTxt = '全不选';
+        this.customerList.forEach( ele => {
+          ele.checked = false;
+        });
+        this.isAllSelected = true;
+      };
+      self.selectedList = [];//每选一次前要清空一次;
+      e.detail.value.forEach( ele => {
+        self.selectedList.push(self.customerList[ele].clientId);      
+      });
+      this.$apply();
+
+    },
+    handleTouchStart(e) {
+      //开始滑动时位置初始化；
+      if(this.isTransfer) {//转移时禁止滑动
+        this.customerList.forEach(function(v, i) {
+          if (v.xMove != 0)
+            //位置初始化
+            v.xMove = 0;
+        });
+        this.startX = e.touches[0].pageX;
+        this.$apply(); 
+      }     
+    },
+    handleTouchEnd(e) {
+      if(this.isTransfer) {//转移时禁止滑动
+        if (e.changedTouches[0].pageX < this.startX && e.changedTouches[0].pageX - this.startX <= -30) {
+          this.showDeleteButton(e);
+        } else if (e.changedTouches[0].pageX > this.startX && e.changedTouches[0].pageX - this.startX < 30) {
+          this.showDeleteButton(e);
+        } else {
+          this.hideDeleteButton(e);
+        }
+      }     
+    },
+    handleMovableChange(e) {
+      if(this.isTransfer) {//转移时禁止滑动
+        if (e.detail.source === 'friction') {
+          if (e.detail.x < -30) {
+            this.showDeleteButton(e)
+          } else {
+            this.hideDeleteButton(e)
+          }
+        } else if (e.detail.source === 'out-of-bounds' && e.detail.x === 0) {
+          this.hideDeleteButton(e)
+        }  
+      }      
+    },
+    handleDelete(m,n){//m:index,n:clientId;
+      var self = this;
+      wx.showModal({
+        title: "删除",
+        content: "删除该用户",
+        success(res) {
+          if(res.confirm) {//点击确定；
+             var request = api.deleteCrmClientUser({
+              header: {
+                'content-type': 'application/json',
+                token: self.token
+              },
+              method: 'POST',
+              data: {
+                clientId: n,
+              }
+            });
+            request.then(res => {
+              let result = res.data.body;
+              if(result.res == "true") {
+                wepy.showToast({
+                  title: result.msg,
+                  icon: "success",
+                  duration: 2000,
+                });
+                self.customerList.splice(m,1);//将该用户从数组中删除；
+                self.$apply();
+              } else {
+                wepy.showToast({
+                  title: result.msg,
+                  icon: "none",
+                  duration: 2000,
+                });
+              }
+            });
+          }
+        }
+      })
+    },
+    //-------- 转移销售员 ------
+    handleSelectedSale(m,n) {//选择要转移的销售员（m:index,n:userId）；
+      this.saleManIndex = m;
+      this.targetUserId = n;
+      this.$apply();
+    },
+    handleCancle() {
+      this.popupVisible = false;
+      this.isNext = true;
+      this.$apply();
+    },
+    handleSure() {
+      this.getTransfer();
+    },
+  };
+
+  /**
+   * 显示删除按钮
+   */
+  showDeleteButton(e) {
+    let productIndex = e.currentTarget.dataset.productindex;
+    this.setXmove(productIndex, -45);
+  }
+
+  /**
+   * 隐藏删除按钮
+   */
+  hideDeleteButton(e) {
+    let productIndex = e.currentTarget.dataset.productindex;
+
+    this.setXmove(productIndex, 0);
+  }
+
+  /**
+   * 设置movable-view位移
+   */
+  setXmove(productIndex, xmove) {
+    let productList = this.customerList;
+    productList[productIndex].xMove = xmove;
+    this.customerList = productList;
+  }
+  
+  /**
+   * 转移用户
+   */
+  getTransfer() {
+    var clientIds = this.selectedList.join(",");
+    var request = api.updateCrmClientUser({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        userId: this.targetUserId,
+        clientIds: clientIds,
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      if(result.res == "true") {
+
+        this.popupVisible = false;
+        this.isNext = true;
+        this.deleteIndexList.forEach( ele => {
+          //对应的删除列表中的用户
+          this.customerList.splice(ele,1);
+        });
+        wepy.showToast({
+          title: result.msg,
+          icon: "success",
+          duration: 2000,
+        });
+        this.$apply();
+      }
+    });
+  };
+
+  getSaleManList() {//获取销售员列表(转移对象列表)
+    var request = api.getCrmUserList({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        mobile: "",
+        storeId: this.storeId,
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      this.saleManList = result;
+      this.targetUserId = this.saleManList[0].userId;
+      this.$apply();
+    });
+  };
+  getCustomerList(typeId,mobile) {//获取用户信息
+    var request = api.getCrmClientList({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        userId: this.userId,
+        storeId: this.storeId,
+        typeId: typeId,
+        mobile: mobile?mobile:"",
+      }
+    });
+    request.then(res => {
+      var result = res.data.body;
+      this.customerList = result;
+      this.$apply();
+    });
+  };
+  events = {};
+
+  onLoad(option) {
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.userId = parseInt(option.userId);
+    this.getCustomerList(this.navActive);
+  }
+}
+</script>

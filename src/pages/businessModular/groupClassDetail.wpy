@@ -1,0 +1,219 @@
+<style lang="less">
+.p-grouptime-detail {
+  position: relative;
+  height: 100vh;
+  padding: 0 40rpx;
+  .p-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 70rpx;
+    .p-h1 {
+      font-size: 50rpx;
+      color: #0a0101;
+    }
+    .p-p {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-top: 45rpx;
+      span {
+        color: #f55454; 
+        padding: 0 5rpx;
+      }
+    }
+    .p-img-head {
+      width: 130rpx;
+      height: 130rpx;
+      border-radius: 50%;
+      overflow: hidden;
+      image {
+        width: 130rpx;
+        height: 130rpx;
+      }
+    }
+    .p-name {
+      width: 125rpx;
+      height: 40rpx;
+      line-height: 40rpx;
+      border-radius: 40rpx;
+      color: #fff;
+      margin-top: 15rpx;
+      font-size: 20rpx;
+      text-align: center;
+      background: #f55454;
+    }
+  }
+  .p-section {
+    margin: 45rpx 0;
+    .p-title {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-bottom: 24rpx;
+    }
+  }
+  .p-section-1 {
+    margin: 45rpx 0;
+    .p-title {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+    }
+    display: flex;
+    align-items: center;
+    .p-class-time {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #f55454;
+      .picker {
+        font-size: 50rpx; 
+      }
+      view {
+        margin: 0 15rpx;
+      }
+    }
+  }
+  .p-section-2 {
+    position: relative;
+    .p-explain {
+      font-size: 30rpx;
+      color: #271818;
+      line-height: 40rpx;
+      padding: 0 15rpx;
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    .p-img-show {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 0 60rpx;
+      view {
+        margin-bottom: 20rpx;
+        image {
+          width: 260rpx;
+          height: 215rpx;
+        }
+      }
+    }
+  }
+  .p-fixed {
+    margin: 50rpx 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    z-index: 9;
+    .p-btn {
+      width: 570rpx;
+      height: 74rpx;
+      line-height: 74rpx;
+      border-radius: 74rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      background: #f55454;
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-grouptime-detail">
+    <view class="p-header">
+      <view class="left">
+        <view class="p-h1">{{ leagueName }}</view>
+        <view class="p-p">可预约人数：<span>{{ peopleNumber }}</span>人</view>
+      </view>
+    </view>
+    <view class="p-section-1">
+      <view class="p-title">上课时间：</view>
+      <view class="p-class-time">
+        <view class="picker">{{startTime}}</view>
+        <view>-</view>
+        <view class="picker">{{endTime}}</view>
+      </view>
+    </view>
+    <view class="p-section p-section-2">
+      <view class="p-title">课程介绍</view>
+      <view class="p-explain">{{ content }}</view>
+    </view>
+    <view class="p-section p-section-3">
+      <view class="p-title">课程展示</view>
+      <view class="p-img-show">
+        <view wx:for="{{ imgShowData }}" wx:key="{{index}}">
+          <image src="{{ item }}" mode="aspectFill"/>
+        </view>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn" @tap="handleClassEdit">编辑</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class groupTimeDetail extends wepy.page {
+  config = {
+    navigationBarTitleText: '团课课程详情'
+  };
+  components = {};
+
+  data = {
+    BASEURL: "",//请求基础地址
+    leagueId: "",
+    leagueName: "",
+    peopleNumber: "",
+    content: "",
+    startTime: '08:30',
+    endTime: '10:30',
+    imgShowData: []
+  };
+
+  computed = {};
+
+  methods = {
+    handleClassEdit() {
+      wepy.navigateTo({
+         url: `groupClassEdit?leagueId=${this.leagueId}`
+      });
+    }
+  };
+  getClassDetail() {
+    var request = api.getCrmOperateLeague({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        leagueId: this.leagueId
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      this.peopleNumber = result.peopleNumber;
+      this.content = result.content;
+      this.leagueName = result.leagueName;
+      this.startTime = result.startTime;
+      this.endTime = result.endTime;
+      this.imgShowData = result.showImg.split(",");
+      this.imgShowData.forEach((ele, index) => {
+        this.imgShowData[index] = `${api.BASE_URL}downloadCrm.do?ossId=${ele}`;
+      });
+      this.$apply();
+    });
+  };
+  events = {};
+  onShow() {
+    this.getClassDetail();
+  };
+  onLoad(option) {
+    this.BASEURL = api.BASE_URL;
+    this.leagueId = parseInt(option.leagueId);
+    this.token = this.$parent.globalData.token;
+    this.getClassDetail();
+  }
+}
+</script>

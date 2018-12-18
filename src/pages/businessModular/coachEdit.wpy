@@ -1,0 +1,655 @@
+<style lang="less">
+.p-private-edit {
+  position: relative;
+  height: 100vh;
+  padding: 0 40rpx;
+  .hide {
+    display: none;
+  }
+  .show {
+    display: block;
+  }
+  .p-section-1 {
+    display: flex;
+    padding-top: 56rpx;
+    align-items: center;
+    .left {
+      flex: 1;
+      .p-c {
+        margin-bottom: 20rpx;
+        display: flex;
+        align-items: center;
+        .p-label {
+          font-size: 32rpx;
+          color: #707070;
+        }
+        input {
+          flex: 1;
+          margin-left: 15rpx;
+          padding-left: 10rpx;
+          font-size: 36rpx;
+          border-bottom: 1rpx solid #707070;
+        }
+      }
+      .p-c-1 {
+        input {
+          padding-left: 0;
+          font-size: 50rpx;
+          height: 80rpx;
+        }
+      }
+      .p-c-2 {
+        & > view {
+          display: flex;
+          flex: 1;
+          align-items: center;
+        }
+        .p-age {
+          margin-left: 50rpx;
+        }
+        .p-sex {
+          border: 1rpx solid rgba(112, 112, 122, 0.2);
+          color: rgba(112, 112, 122, 0.2);
+          // opacity: 0.2;
+          margin-left: 20rpx;
+          display: inline-block;
+          font-size: 24rpx;
+          width: 40rpx;
+          height: 40rpx;
+          text-align: center;
+          line-height: 40rpx;
+          &.active {
+            border: 1rpx solid #f55454;
+            color: #f55454;
+          }
+        }
+      }
+      .p-c-4 {
+        background: rgba(32, 4, 4, 0.1);
+        height: 40rpx;
+        line-height: 40rpx;
+        border-radius: 40rpx;
+        width: 270rpx;
+        view {
+          flex: 1;
+          font-size: 28rpx;
+          color: #707070;
+          text-align: center;
+          &.active {
+            background: #f64343;
+            border-radius: 40rpx;
+            color: #fff;
+          }
+        }
+      }
+    }
+    .right {
+      width: 198rpx;
+      height: 240rpx;
+      position: relative;
+      margin-left: 70rpx;
+      border-radius: 8rpx;
+      overflow: hidden;
+      image {
+        width: 198rpx;
+        height: 240rpx;
+      }
+    }
+  }
+  .p-section-2 {
+    position: relative;
+    margin-top: 44rpx;
+    .p-title {
+      font-size: 32rpx;
+      color: #707070;
+    }
+    textarea {
+      width: 100%;
+      height: 140rpx;
+      margin-top: 20rpx;
+      padding: 10rpx;
+      background: #ffffff;
+      border: 1px solid #363232;
+      cursor: text;
+      border-radius: 6rpx;
+      box-sizing: border-box;
+      font-size: 30rpx;
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    margin-top: 30rpx;
+    .p-title {
+        margin-bottom: 20rpx;
+      }
+    .p-upload {
+      display: flex;
+      flex-wrap: wrap;
+      view {
+        width: 140rpx;
+        height: 150rpx;
+        margin-right: 20rpx;
+        margin-bottom: 20rpx;
+        image {
+          width: 140rpx;
+          height: 150rpx;
+        }
+      }
+      .p-button {
+        background: #aeaaaa;
+        position: relative;
+        &:after,
+        &:before {
+          position: absolute;
+          content: '';
+          display: block;
+          background: #fff;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        &:after {
+          width: 4rpx;
+          height: 44rpx;
+        }
+        &:before {
+          width: 44rpx;
+          height: 4rpx;
+        }
+      }
+    }
+  }
+  .p-section-4 {
+    margin-top: 40rpx;
+    .p-title {
+      margin-bottom: 24rpx;
+    }
+    .p-price-col {
+      display: flex;
+      align-items: center;
+      padding-left: 40rpx;
+      margin-bottom: 10rpx;
+      font-size: 32rpx;
+      color: #707070;
+      .p-label {
+        width: 120rpx;
+        margin-right: 20rpx;
+      }
+      input {
+        width: 120rpx;
+        padding: 0 5rpx;
+        border: 1px solid #707070;
+        margin-right: 20rpx;
+        text-align: center;
+      }
+    }
+  }
+  .p-fixed {
+    padding: 0 40rpx;
+    margin: 100rpx 0 60rpx;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    z-index: 9;
+    .p-btn {
+      width: 262rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 74rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-private-edit">
+    <view class="p-section-1">
+      <view class="left">
+        <view class="p-c p-c-1">
+          <input type="text" value="{{nameVal}}" @input="handleName" />
+        </view>
+        <view class="p-c p-c-2">
+          <view>
+            <view class="p-label">性别:</view>
+            <view class="p-sex" :class="{active: gender == 1}" @tap="sex(1)">男</view>
+            <view class="p-sex" :class="{active: gender == 2}" @tap="sex(2)">女</view>
+          </view>
+          <view>
+            <view class="p-label p-age">年龄:</view>
+            <input type="number" value="{{ageVal}}" @input="handleAge" />
+          </view>
+        </view>
+        <view class="p-c p-c-3">
+          <view class="p-label">电话：</view>
+          <input type="number" value="{{mobileVal}}" @input="handleMobile" />
+        </view>
+        <view class="p-c p-c-4">
+          <view :class="{active:bespeak == 1}" @tap="handleOrder(1)">可预约</view>
+          <view :class="{active:bespeak == 2}" @tap="handleOrder(2)">不可预约</view>
+        </view>
+      </view>
+      <view class="right" @tap="addUserHead"><image src="{{ imghead }}" mode="aspectFill" /></view>
+    </view>
+    <view class="p-section-2">
+      <view class="p-title">个人介绍</view>
+      <textarea value="{{areaVal}}" @input="handleArea"></textarea>
+    </view>
+    <view class="p-section-3">
+      <view class="p-title">个人资质</view>
+      <view class="p-upload">
+        <view class="{{coachIntel.length>0?'show':'hide'}}" wx:for="{{coachIntel}}" wx:key="{{index}}" @tap="handleDeleteIntel({{index}})"><image src="{{ BASEURL+'downloadCrm.do?ossId='+item }}" mode="aspectFill" /></view>
+        <view class="p-button" @tap="handleUpload"></view>
+      </view>
+    </view>
+    <view class="p-section-4" wx:if="{{modularType=='1'}}">
+      <view class="p-title">价格设置</view>
+      <view class="p-price-col">
+        <view class="p-label">原价</view>
+        <view>
+          <input type="number" value="{{onePriceVal}}" @input="handleOnePeople"/>
+        </view>
+        <view>元/课</view>
+      </view>
+      <view class="p-price-col">
+        <view class="p-label">团购价</view>
+        <view>
+          <input type="number" value="{{twoPriceVal}}" @input="handleTwoPeople"/>
+        </view>
+        <view>元/2人</view>
+      </view>
+      <view class="p-price-col">
+        <view class="p-label"></view>
+        <view>
+          <input type="number" value="{{threePriceVal}}" @input="handleThreePeople"/>
+        </view>
+        <view>元/3人</view>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+const regPhone = /^[1][3,4,5,7,8][0-9]{9}$/;
+const regNumber = /^[0-9]*$/;
+
+export default class privateEdit extends wepy.page {
+  config = {
+    navigationBarTitleText: '编辑教练信息'
+  };
+  components = {};
+
+  data = {
+    BASEURL: "",//请求基础地址
+    coachId: "",//健身房id
+    token: "",
+    gender: 1,//性别
+    bespeak: 1, //是否可预约
+    nameVal: "",
+    ageVal: "",
+    mobileVal: "",
+    areaVal: "",
+    onePriceVal: "",
+    twoPriceVal: "",
+    threePriceVal: "",
+    coachData: [],//教练数据
+    priceData: [],//团课价格
+    coachIntel: [],//教练资质
+    coachhead: "",//教练头像传值
+    imghead: "",//教练头像渲染
+    state: "",//在职状态
+    modularType: "1",// 1私教课教练,2团课教练
+  };
+
+  computed = {};
+
+  methods = {
+    sex(index) {
+      this.gender = parseInt(index);
+    },
+    handleName(e) {
+      this.nameVal = e.detail.value;
+    },
+    handleAge(e) {
+      this.ageVal = e.detail.value;
+      if(this.ageVal!="") {
+        this.ageVal = parseInt(this.ageVal);
+      }
+    },
+    handleMobile(e) {
+      this.mobileVal = e.detail.value;
+    },
+    handleOrder(m) {
+      this.bespeak = parseInt(m);
+    },
+    handleArea(e) {
+      this.areaVal = e.detail.value;
+    },
+    addUserHead() {//上传头像~
+      var self = this;
+      self.upLoad().then(res => {
+        if(res) {
+          self.coachhead = res;
+          self.imghead = `${api.BASE_URL}downloadCrm.do?ossId=${res}`;
+          self.$apply();
+        }
+      });
+    },
+    handleUpload() {//上传教练的资质~
+      var self = this;
+      self.upLoad().then(res => {
+        if(res) {
+          self.coachIntel.push(res);
+          self.$apply();
+        }
+      });
+    },
+    handleDeleteIntel(m) {
+      var self = this;
+      wx.showModal({
+        title: "删除",
+        content: "删除该条教练资质",
+        success(res) {
+          if(res.confirm) {
+            self.coachIntel.splice(m,1);
+            self.$apply();
+          }
+        },
+      })
+    },
+    handleOnePeople(e) {
+      this.onePriceVal = Number(e.detail.value);
+    },
+    handleTwoPeople(e) {
+      this.twoPriceVal = Number(e.detail.value);
+    },
+    handleThreePeople(e) {
+      this.threePriceVal = Number(e.detail.value);
+    },
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      });
+    },
+    btnSure() {
+
+      if(this.checkVal()) {
+        
+        if(this.modularType == "1") {
+          this.praviteCoach();
+        } else {
+          this.groupCoach();
+        }
+      }
+           
+    },
+  };
+  praviteCoach() {
+    // var coachAptitude = this.coachIntel.toString();//两者都可
+    var coachAptitude = this.coachIntel.join(",") + ",";
+    var data = {
+      coachName: this.nameVal,
+      coachImg: this.coachhead,
+      sex: this.gender,
+      age: this.ageVal,
+      mobile: this.mobileVal,
+      introduce: this.areaVal,
+      aptitude: coachAptitude,
+      bespeak: this.bespeak,
+      state: this.state,
+      price: (this.onePriceVal).toFixed(2),
+      twoPrice: (this.twoPriceVal).toFixed(2),
+      threePrice: (this.threePriceVal).toFixed(2),
+      storeId: this.storeId,
+      coachId: this.coachId,
+    };
+    var request = api.updateCrmOperateCoach({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: data,
+    });
+    request.then(res => {
+
+      let result = res.data.body;
+      if(result.res == "true") {
+        wepy.showToast({
+          title: result.msg,
+          icon: "success",
+          duration: 2000,
+        });
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1
+          })
+        }, 2000);
+      } else {
+        wepy.showToast({
+          title: result.msg,
+          icon: "none",
+          duration: 2000,
+        });
+      }
+    });
+  };
+  groupCoach() {
+    // var coachAptitude = this.coachIntel.toString();//两者都可
+    var coachAptitude = this.coachIntel.join(",")+ ",";
+    var data = {
+      coachName: this.nameVal,
+      coachImg: this.coachhead,
+      sex: this.gender,
+      age: this.ageVal,
+      mobile: this.mobileVal,
+      introduce: this.areaVal,
+      aptitude: coachAptitude,
+      bespeak: this.bespeak,
+      state: this.state,
+      storeId: this.storeId,
+      coachId: this.coachId,
+    };
+    var request = api.updateLeagueCrmOperateCoach({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: data,
+    });
+    request.then(res => {
+
+      let result = res.data.body;
+      if(result.res == "true") {
+        wepy.showToast({
+          title: result.msg,
+          icon: "success",
+          duration: 2000,
+        });
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1
+          })
+        }, 2000);
+      } else {
+        wepy.showToast({
+          title: result.msg,
+          icon: "none",
+          duration: 2000,
+        });
+      }
+    });
+  };
+  checkVal() {
+    if (this.nameVal == '') {
+      wepy.showToast({
+        title: '请输入姓名',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.ageVal == '') {
+      wepy.showToast({
+        title: '请输入年龄',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.mobileVal == '') {
+      wepy.showToast({
+        title: '请输入手机号码',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if(this.coachImg == "") {
+      wepy.showToast({
+        title: '请上传教练的头像',
+        icon: 'none',
+        duration: 2000
+      });
+    } else if(this.coachIntel.length<=0) {
+      wepy.showToast({
+        title: '请上传教练的个人资质',
+        icon: 'none',
+        duration: 2000
+      });
+    } else if (!regNumber.test(this.ageVal)) {
+      wepy.showToast({
+        title: '年龄必须为数字',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (!regPhone.test(this.mobileVal)) {
+      wepy.showToast({
+        title: '请输入正确的手机号',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if(this.modularType == "1") {//私教课多验证三个价格
+      if(this.onePriceVal == "") {
+        wepy.showToast({
+          title: '请输入原价',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      } else if(this.twoPriceVal == "" ) {
+         wepy.showToast({
+          title: '请输入二人团购价',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      } else if(this.threePriceVal == "" ) {
+         wepy.showToast({
+          title: '请输入三人团购价',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  };
+  upLoad() {//执行上传功能，根据需要返回相应的参数
+    return new Promise(function(resolve, reject){
+      wx.chooseImage({
+        count: 1,
+        sizeType: ['original', 'compressed'],
+        sourceType: ['album', 'camera'],
+        success (res){
+          // tempFilePath可以作为img标签的src属性显示图片    
+          let tempFilePaths = res.tempFilePaths;
+          wx.uploadFile({
+            url: `${api.BASE_URL}uploadCrm.do`, //上传地址
+            filePath: tempFilePaths[0],
+            name: "file", 
+            success(res){
+              if(res.statusCode == 200) {
+                let result = JSON.parse(res.data);//data为对象字符串
+                let ossId = result.body;
+                resolve(ossId);
+                // wepy.showToast({
+                //   title: "上传成功",
+                //   duration: 2000,
+                // });
+              }
+            }
+          })
+        }
+      });
+    });    
+  };
+  getCoachDetail() {
+    var request = api.getCrmOperateCoach({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        coachId: this.coachId,
+      }
+    });
+    request.then(res => {
+
+      let result = res.data.body;
+
+      this.coachData = result.crmOperateCoach;
+      this.priceData = result.crmOperateCoursePrice;
+      
+      this.nameVal = this.coachData.coachName;
+      this.ageVal = this.coachData.age;
+      this.gender = this.coachData.sex;
+      this.mobileVal = this.coachData.mobile;
+      this.bespeak = this.coachData.bespeak;
+      this.areaVal = this.coachData.introduce;
+      this.coachhead = this.coachData.coachImg;//用于提交传值
+      this.imghead = `${api.BASE_URL}downloadCrm.do?ossId=${this.coachData.coachImg}`;//用于渲染页面
+      this.state = this.coachData.state;
+
+      this.onePriceVal = parseFloat(this.priceData.price); 
+      this.twoPriceVal = parseFloat(this.priceData.twoPrice); 
+      this.threePriceVal = parseFloat(this.priceData.threePrice); 
+
+      this.coachIntel = this.coachData.aptitude.split(",");
+      //由于编辑提交时要传ossId字符串故在此不做添加
+      // this.coachIntel.forEach((ele, index) => {
+      //   this.coachIntel[index] = `${api.BASE_URL}downloadCrm.do?ossId=${ele}`;
+      // });
+      this.$apply();
+    })
+  };
+  events = {};
+
+  onLoad(option) {
+    this.BASEURL = api.BASE_URL;
+    this.coachId = parseInt(option.coachId);
+    this.modularType = option.modularType;
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.getCoachDetail();
+  }
+}
+</script>

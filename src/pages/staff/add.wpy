@@ -1,0 +1,391 @@
+<style lang="less">
+.p-staff-add {
+  position: relative;
+  height: 100vh;
+  .p-section-1 {
+    display: flex;
+    align-items: center;
+    padding-top: 80rpx;
+    .left {
+      flex: 1;
+      padding-left: 40rpx;
+      .p-c {
+        margin-bottom: 10rpx;
+        display: flex;
+        align-items: center;
+        span {
+          color: #707070;
+        }
+        input {
+          border-bottom: 1rpx solid #707070;
+          margin-left: 10rpx;
+        }
+      }
+      .p-c-1 {
+        span {
+          font-size: 58rpx;
+        }
+        input {
+          flex: 1;
+          font-size: 50rpx;
+        }
+      }
+      .p-c-2 {
+        span {
+          font-size: 32rpx;
+        }
+        .p-age {
+          margin-left: 30rpx;
+        }
+        i {
+          border: 1rpx solid rgba(112, 112, 122, 0.2);
+          color: rgba(112, 112, 122, 0.2);
+          // opacity: 0.2;
+          margin-left: 20rpx;
+          display: inline-block;
+          font-size: 30rpx;
+          width: 40rpx;
+          height: 40rpx;
+          text-align: center;
+          line-height: 40rpx;
+          &.active {
+            border: 1rpx solid #f55454;
+            color: #f55454;
+          }
+        }
+        input {
+          flex: 1;
+          font-size: 30rpx;
+        }
+      }
+      .p-c-3 {
+        span {
+          font-size: 32rpx;
+          color: #707070;
+        }
+        input {
+          flex: 1;
+          font-size: 32rpx;
+        }
+      }
+    }
+    .right {
+      width: 300rpx;
+      display: flex;
+      margin-left: 50rpx;
+      .p-k-wrap {
+        width: 196rpx;
+        .p-k-tr {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .p-k-con {
+          width: 98rpx;
+          height: 98rpx;
+          line-height: 99rpx;
+          border-radius: 15rpx;
+          background: #f8f8f8;
+          color: rgba(112, 112, 112, 0.2);
+          font-size: 80rpx;
+          text-align: center;
+          &.active {
+            background: #f55454;
+            color: #fff;
+          }
+        }
+      }
+      .p-k-tip {
+        flex: 1;
+        height: 196rpx;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: #aba9a9;
+        color: #fff;
+        border-radius: 15rpx 0 0 15rpx;
+        font-weight: bold;
+        font-size: 57rpx;
+        flex-direction: column;
+        padding-left: 20rpx;
+        box-sizing: border-box;
+      }
+    }
+  }
+  .p-s-title {
+    font-size: 34rpx;
+    color: #707070;
+    font-weight: bold;
+    margin: 50rpx 40rpx 20rpx;
+  }
+  .p-section-2 {
+    border: 1rpx solid #707070;
+    padding: 10rpx;
+    margin: 20rpx 40rpx;
+    .p-s-time {
+      display: flex;
+      align-items: center;
+      font-size: 20rpx;
+      color: #707070;
+      picker {
+        height: 30rpx;
+        border-bottom: 1rpx solid #707070;
+      }
+    }
+    .p-s-con {
+      width: 100%;
+      height: 180rpx;
+      margin-top: 10rpx;
+      padding: 10rpx;
+      font-size: 28rpx;
+      box-sizing: border-box;
+      border-radius: 8rpx;
+      border: 1rpx solid #707070;
+    }
+  }
+  .p-fixed {
+    position: fixed;
+    bottom: 50rpx;
+    left: 0;
+    padding: 0 40rpx;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    z-index: 9;
+    .p-btn {
+      width: 263rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 70rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-staff-add">
+    <view class="p-section-1">
+      <view class="left">
+        <view class="p-c p-c-1">
+          <span>姓名:</span>
+          <input type="text" value="{{nameVal}}" @input="nameFun"/>
+        </view>
+        <view class="p-c p-c-2">
+          <span>性别:</span>
+          <i :class="{active: gender == 1}" @tap="sex(1)">男</i>
+          <i :class="{active: gender == 2}" @tap="sex(2)">女</i>
+          <span class="p-age">年龄:</span>
+          <input type="number" value="{{ageVal}}" @input="ageFun"/>
+        </view>
+        <view class="p-c p-c-3">
+          <span>电话：</span>
+          <input type="text" value="{{mobileVal}}" @input="mobileFun"/>
+        </view>
+      </view>
+      <view class="right">
+        <view class="p-k-wrap">
+          <view class="p-k-tr">
+            <view class="p-k-con" :class="{active:kindNumber == 1}" @tap="selectedKind(1)">1</view>
+            <view class="p-k-con" :class="{active:kindNumber == 2}" @tap="selectedKind(2)">2</view>
+          </view>
+          <view class="p-k-tr">
+            <view class="p-k-con" :class="{active:kindNumber == 3}" @tap="selectedKind(3)">3</view>
+            <view class="p-k-con" :class="{active:kindNumber == 4}" @tap="selectedKind(4)">4</view>
+          </view>
+        </view>
+        <view class="p-k-tip">
+          <view>类</view>
+          <view>别</view>
+        </view>
+      </view>
+    </view>
+    <view class="p-s-title">回访记录</view>
+    <view class="p-section-2">
+      <view class="p-s-time">时间：
+        <picker
+          value="{{visitTime}}"
+          mode="date"
+          bindchange="pickerFun"
+          start="2015-12-31"
+          end="{{endTime}}"
+        >{{visitTime}}</picker>
+      </view>
+      <textarea class="p-s-con" value="{{ areaVal }}" @input="areaFun"></textarea>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+import dateTime from '@/utils/date.js';
+const regPhone = /^[1][3,4,5,7,8][0-9]{9}$/;
+const regNumber = /^[0-9]*$/;
+export default class staffAdd extends wepy.page {
+  config = {
+    navigationBarTitleText: '添加新客户'
+  };
+  components = {};
+
+  data = {
+    kindNumber: 1, //客户类别
+    gender: 1, //客户性别
+    nameVal: '', //客户姓名
+    ageVal: '', //客户年龄
+    mobileVal: '', //手机号码
+    areaVal: '', //回访记录
+    endTime: '',
+    visitTime: '',
+    token: '',
+    userId: '',
+    storeId: '',
+    message: ''
+  };
+
+  computed = {};
+
+  methods = {
+    sex(index) {
+      this.gender = parseInt(index);
+    },
+    selectedKind(m) {
+      this.kindNumber = parseInt(m);
+    },
+    nameFun(e) {
+      this.nameVal = e.detail.value;
+    },
+    ageFun(e) {
+      this.ageVal = e.detail.value;
+      if(this.ageVal != "") {
+        this.ageVal = parseInt(this.ageVal);
+      }
+    },
+    mobileFun(e) {
+      this.mobileVal = e.detail.value;
+    },
+    areaFun(e) {
+      this.areaVal = e.detail.value;
+    },
+    pickerFun(e) {
+      this.visitTime = e.detail.value;
+    },
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      });
+    },
+    btnSure() {
+      if (this.checkVal()) {
+        var request = api.saveCrmClient({
+          header: {
+            'content-type': 'application/json',
+            token: this.token
+          },
+          method: 'POST',
+          data: {
+            name: this.nameVal,
+            age: this.ageVal,
+            sex: this.gender,
+            mobile: this.mobileVal,
+            typeId: this.kindNumber,
+            remarks: this.areaVal,
+            contactTime: this.visitTime,
+            storeId: this.storeId,
+            userId: this.userId
+          }
+        });
+        request.then(res => {
+          let result = res.data.body;
+          if(result.res) {
+            wepy.showToast({
+              title: result.msg,
+              icon: "success",
+              duration: 2000,
+            });
+            setTimeout(() => {
+              wepy.navigateBack({
+                delta: 1
+              })
+            }, 2000);
+            
+          } else {
+            wepy.showToast({
+              title: result.msg,
+              icon: "none",
+              duration: 2000,
+            });
+          }
+        });
+      }
+    }
+  };
+  checkVal() {
+    if (this.nameVal == '') {
+      wepy.showToast({
+        title: '请输入姓名',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.ageVal == '') {
+      wepy.showToast({
+        title: '请输入年龄',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.mobileVal == '') {
+      wepy.showToast({
+        title: '请输入手机号码',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.areaVal == '') {
+      wepy.showToast({
+        title: '请输入回访记录',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (!regNumber.test(this.ageVal)) {
+      wepy.showToast({
+        title: '年龄必须为数字',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (!regPhone.test(this.mobileVal)) {
+      wepy.showToast({
+        title: '请输入正确的手机号',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+  events = {};
+
+  onLoad(option) {
+    let self = this;
+    self.visitTime = self.endTime = dateTime.formatTime(new Date());
+    self.storeId = this.$parent.globalData.storeId;
+    self.token = this.$parent.globalData.token;
+    self.userId = parseInt(option.userId);
+  }
+}
+</script>

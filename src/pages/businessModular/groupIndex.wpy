@@ -1,0 +1,241 @@
+<style lang="less">
+.p-business-index {
+  position: relative;
+  padding: 0 40rpx;
+  .hide {
+    display: none !important;
+  }
+  .show {
+    display: block !important;
+  }
+  .p-tab {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    view {
+      flex: 1;
+      height: 120rpx;
+      line-height: 120rpx;
+      font-size: 30rpx;
+      color: #fff8f8;
+      text-align: center;
+      border-radius: 12rpx;
+      background: rgba(10, 1, 1, 0.3);
+      &:first-child {
+        margin-right: 10rpx;
+      }
+      &.active {
+        background: #f55454;
+        color: #fff;
+      }
+    }
+  }
+  .p-container {
+    .p-modular-con {
+      display: none;
+      .p-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin: 60rpx 0 35rpx;
+        position: relative;
+        .p-left {
+          display: flex;
+          view {
+            font-size: 32rpx;
+            color: rgba(39, 24, 24, 0.5);
+            margin-right: 30rpx;
+          }
+          .active {
+            color: rgb(39, 24, 24);
+            font-weight: bold;
+          }
+        }
+        .b-add {
+          width: 40rpx;
+          height: 40rpx;
+          position: relative;
+          &:after,
+          &:before {
+            display: block;
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+          &:after {
+            width: 40rpx;
+            height: 8rpx;
+            background: #190404;
+          }
+          &:before {
+            width: 8rpx;
+            height: 40rpx;
+            background: #190404;
+          }
+        }
+      }
+    }
+    .p-group-container {
+      position: relative;
+      .p-group-con {
+        display: none;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-business-index">
+    <view class="p-tab">
+      <view :class="{active:tabNav == '1'}" @tap="tabModularToggle('1')">私教课模块</view>
+      <view :class="{active:tabNav == '2'}" @tap="tabModularToggle('2')">团课模块</view>
+    </view>
+    <view class="p-container">
+      <view class="p-modular-con" :class="{show:tabNav == '1'}">
+        <view class="p-header">
+          <view class="p-left">
+            <view class="active">教练模块</view>
+            <view @tap="jumpToCourseModular">课程模块</view>
+          </view>
+          <view class="b-add" @tap="handleAddCoach"></view>
+        </view>
+        <pcoachlist></pcoachlist>
+      </view>
+      <view class="p-modular-con" :class="{show:tabNav == '2'}">
+        <view class="p-header">
+          <view class="p-left">
+            <view :class="{active:groupNav == '1'}" @tap="tabGroupToggle('1')">团课课表</view>
+            <view :class="{active:groupNav == '2'}" @tap="tabGroupToggle('2')">团课列表</view>
+            <view :class="{active:groupNav == '3'}" @tap="tabGroupToggle('3')">教练列表</view>
+          </view>
+          <view class="b-add" @tap="handleAddCourse({{ groupNav }})"></view>
+        </view>
+        <view class="p-group-container">
+          <view class="p-group-con" :class="{show:groupNav == '1'}">
+            <grouptimetable></grouptimetable>
+          </view>
+          <view class="p-group-con" :class="{show:groupNav == '2'}">
+            <groupclasstable></groupclasstable>
+          </view>
+          <view class="p-group-con" :class="{show:groupNav == '3'}">
+            <gcoachlist></gcoachlist>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+import date from '@/utils/date.js';
+import coachList from '@/components/coachList';
+import groupTimeTable from '@/components/groupTimeTable';
+import groupClassTable from '@/components/groupClassTable';
+
+export default class businessIndex extends wepy.page {
+  config = {
+    navigationBarTitleText: '私教课模块'
+  };
+  components = {
+    pcoachlist: coachList,//私教课教练列表
+    gcoachlist: coachList,//团课教练列表
+    grouptimetable: groupTimeTable,//团课课表
+    groupclasstable: groupClassTable,//团课列表
+  };
+
+  data = {
+    week: "",//默认当天；
+    weekNav: "",//子组件返回的值；
+    tabNav: '1',
+    groupNav: '1',
+    storeId: "",
+    token: "",
+  };
+
+  computed = {};
+
+  methods = {
+    tabModularToggle(m) {
+      this.tabNav = m;
+      if(m == 1) {
+        this.$invoke('pcoachlist',"modular","1");
+      } else {
+        this.$invoke('gcoachlist',"modular","2");
+      }    
+      this.$apply();
+    },
+    tabGroupToggle(m) {
+      this.groupNav = m;
+    },
+    handleAddCoach() {
+      wepy.navigateTo({
+        url: `coachAdd?modularType=${this.tabNav}`
+      });
+    },
+    jumpToCourseModular() {
+      wepy.navigateTo({
+        url: 'courseModular'
+      });
+    },
+    handleAddCourse(index) {
+      console.log(this.weekNav);
+      if(index == 1) {//团课课表
+        wepy.navigateTo({
+          url: `groupTimeAdd?weekNav=${this.weekNav}`
+        });
+      } else if(index == 2) {//团课类别
+        wepy.navigateTo({
+          url: 'groupClassAdd'
+        });
+      } else if(index  == 3) {//团课教练
+        wepy.navigateTo({
+          url: `coachAdd?modularType=${this.tabNav}`
+        });
+      }
+    },
+    
+  };
+  onShow() {//返回时刷新列表数据 
+    if(this.tabNav == "1") {
+      this.$invoke('pcoachlist',"getCoachList");
+    } else if(this.tabNav == "2") {
+      let params = this.week;
+      if(this.weekNav == "") {
+        params = this.week;
+      } else {
+        params = this.weekNav;
+      };
+      if (this.groupNav == "1") {
+        this.$invoke('grouptimetable',"updateList",params);
+      } else if(this.groupNav == "2") {
+        this.$invoke('groupclasstable',"getGroupClassList");
+      } else if(this.groupNav == "3") {
+        this.$invoke('gcoachlist',"getCoachList");
+      };   
+    }
+    
+  };
+  events = {
+    "time-emit": (...args) => {
+      this.weekNav = args[0];
+    }  
+  };
+
+  onLoad() {
+
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.week = date.formatWeek(new Date());
+    if(this.week == 0) {
+      this.week = 7
+    };
+    this.week = this.week-1;
+
+  }
+}
+</script>

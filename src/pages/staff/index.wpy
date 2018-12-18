@@ -1,0 +1,208 @@
+<style lang="less">
+.p-staff-index {
+  position: relative;
+  .p-header {
+    padding: 0 40rpx;
+    width: 100%;
+    box-sizing: border-box;
+    .p-search {
+      display: flex;
+      align-items: center;
+      input {
+        flex: 1;
+        background: #e7e7e8;
+        height: 48rpx;
+        line-height: 48rpx;
+        font-size: 36rpx;
+        padding: 10rpx;
+        margin-right: 20rpx;
+      }
+      label {
+        font-size: 40rpx;
+        color: #707070;
+        font-weight: 600;
+      }
+    }
+    .p-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30rpx;
+      .p-nav-li {
+        font-size: 36rpx;
+        padding: 10rpx 24rpx;
+        background: #e7e7e8;
+        color: #707070;
+        border-radius: 10rpx;
+        font-weight: bold;
+        &.active {
+          background: green;
+          color: #fff;
+        }
+      }
+    }
+    .p-custom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 40rpx;
+      .b-add {
+        color: #190404;
+        font-size: 56rpx;
+        font-weight: bold;
+      }
+    }
+  }
+  .p-custom-list {
+    position: relative;
+    margin-top: 20rpx;
+    .p-custom-con {
+      display: flex;
+      height: 80rpx;
+      align-items: center;
+      padding: 0 40rpx;
+      font-size: 40rpx;
+      color: #707070;
+      &:nth-child(odd) {
+        background: rgba(207, 205, 205, 0.1);
+      }
+      .p-c-name {
+        font-weight: bold;
+        width: 250rpx;
+      }
+      .p-c-gender {
+        width: 200rpx;
+      }
+      .p-c-phone {
+        flex: 1;
+        text-align: right;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-staff-index">
+    <view class="p-header">
+      <view class="p-search">
+        <input type="text" value="{{searchVal}}" @input="searchFun" />
+        <label @tap="btnSearch">搜索</label>
+      </view>
+      <view class="p-nav">
+        <view class="p-nav-li" :class="{active: navActive == 0}" @tap="btnNav(0)">全部</view>
+        <view class="p-nav-li" :class="{active: navActive == 1}" @tap="btnNav(1)">1类</view>
+        <view class="p-nav-li" :class="{active: navActive == 2}" @tap="btnNav(2)">2类</view>
+        <view class="p-nav-li" :class="{active: navActive == 3}" @tap="btnNav(3)">3类</view>
+        <view class="p-nav-li" :class="{active: navActive == 4}" @tap="btnNav(4)">4类</view>
+      </view>
+      <view class="p-custom">
+        <view>用户列表</view>
+        <view class="b-add" @tap="btnAdd">+</view>
+      </view>
+    </view>
+    <view class="p-custom-list">
+      <view
+        class="p-custom-con"
+        wx:for="{{customerList}}"
+        wx:key="{{ item.phone }}"
+        data-id="{{item.clientId}}"
+        @tap="btnDetail"
+      >
+        <view class="p-c-name">{{ item.name }}</view>
+        <view class="p-c-gender">{{ genderData[item.sex-1] }}</view>
+        <view class="p-c-phone">{{ item.mobile }}</view>
+      </view>
+      
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class staffIndex extends wepy.page {
+  config = {
+    navigationBarTitleText: '客户'
+  };
+  components = {};
+
+  data = {
+    searchVal: "",//搜索值
+    navActive: 0,//类别nav
+    userId: '',//用户id
+    storeId: '',//健身房id
+    token: '',//用户token
+    customerList: [],//用户列表数据
+    genderData: ['男', '女'],
+  };
+
+  computed = {};
+
+  methods = {
+    searchFun(e) {
+      this.searchVal = e.detail.value;  
+    },
+    btnSearch() {
+      if(this.searchVal != "") {
+        console.log('hah，我是搜索按钮！');
+        this.getCustomerList(this.navActive,this.searchVal);
+      }
+    },
+    btnNav(index) {
+      this.navActive = parseInt(index);
+      this.getCustomerList(this.navActive);
+    },
+    btnAdd() {
+      wepy.navigateTo({
+        url: `add?userId=${this.userId}`
+      });
+    },
+    btnDetail(e) {
+      console.log(
+        'hah，我要带着参数进入用户的详情内容了！' + e.currentTarget.dataset.id
+      );
+      wepy.navigateTo({
+        url: `detail?clientId=${e.currentTarget.dataset.id}`
+      });
+    }
+  };
+  getCustomerList(typeId,mobile) {
+    var request = api.getCrmClientList({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        userId: this.userId,
+        storeId: this.storeId,
+        typeId: typeId,
+        mobile: mobile?mobile:"",
+      }
+    });
+    request.then(res => {
+      console.log(res);
+      var result = res.data.body;
+      this.customerList = result;
+      this.$apply();
+    });
+  };
+  events = {};
+  onShow(){
+    // this.navActive = 0;
+    // this.searchVal = "";
+    this.getCustomerList(this.navActive);
+  };
+  onLoad(option) {
+    //uesrId--当销售员登录时为销售员id，当老板登录是为老板的id；
+    this.userId = this.$parent.globalData.userId;
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    if(option.userId != "" && option.userId != undefined) {
+      //老板查看销售员的用户列表，userId更新为销售员的id
+      this.userId = parseInt(option.userId);
+    }
+    this.getCustomerList(this.navActive);
+  }
+}
+</script>

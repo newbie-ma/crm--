@@ -1,0 +1,259 @@
+<style lang="less">
+.p-group-list {
+  position: relative;
+  padding-bottom: 40rpx;
+  .p-con-list {
+    .p-con-con {
+      width: 100%;
+      position: relative;
+      z-index: 99;
+      margin-bottom: 20rpx;
+      .p-c-name {
+        font-weight: bold;
+      }
+      movable-area {
+        height: 140rpx;
+        width: calc(~'100% - 100rpx');
+        movable-view {
+          height: 140rpx;
+          width: calc(~'100vw - 80rpx');
+          z-index: 99;
+          box-sizing: border-box;
+        }
+      }
+      .p-con-info {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 140rpx;
+        padding: 20rpx;
+        background: #fff;
+        font-size: 28rpx;
+        color: #271818;
+        font-weight: bold;
+        box-sizing: border-box;
+        border: 3rpx solid #707070;
+        z-index: 9;
+        & > view {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .p-c-bottom {
+          font-size: 20rpx;
+          span {
+            padding: 0 5rpx;
+          }
+        }
+      }
+      .p-delete {
+        position: absolute;
+        right: 0;
+        top: 0;
+        background: #f55454;
+        width: 100rpx;
+        height: 140rpx;
+        line-height: 140rpx;
+        z-index: 1;
+        color: #FEFEFE;
+        text-align: center;
+        font-size: 36rpx;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-group-list">
+    <view class="p-con-list">
+      <view
+        class="p-con-con"
+        wx:for="{{groupClassList}}"
+        wx:key="{{ index }}"
+        @tap="handleClassDetail({{item.leagueId}})"
+      >
+        <movable-area>
+          <movable-view
+            out-of-bounds="true"
+            direction="horizontal"
+            x="{{item.xMove}}"
+            inertia="true"
+            data-productindex="{{index}}"
+            bindtouchstart="handleTouchStart"
+            bindtouchend="handleTouchEnd"
+            bindchange="handleMovableChange"
+          >
+            <view class="p-con-info">
+              <view>
+                <view>{{ item.leagueName }}</view>
+                <view>{{item.startTime}} - {{item.endTime}}</view>
+              </view>
+              <view>
+                <!-- <view>{{ item.coachName }}</view> -->
+                <view class="p-c-bottom">可预约人数<span>{{ item.peopleNumber }}</span>人</view>
+              </view>
+            </view>
+          </movable-view>
+        </movable-area>
+        <view class="p-delete" catchtap="handleDeleteClass({{index}},{{item.leagueId}})">删除</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class groupClassTable extends wepy.component {
+  
+  components = {};
+
+  data = {
+    startX: 0,
+    startY: 0,
+    groupClassList: [],
+  };
+
+  computed = {};
+
+  methods = {
+    handleClassDetail(m) {
+      wepy.navigateTo({
+         url: `groupClassDetail?leagueId=${m}`
+      });
+    },
+    handleTouchStart(e) {
+      this.groupClassList.forEach(function(v, i) {
+        if (v.xMove != 0)
+          //只操作为true的
+          v.xMove = 0;
+      });
+      this.startX = e.touches[0].pageX;
+    },
+    handleTouchEnd(e) {
+      if (
+        e.changedTouches[0].pageX < this.startX &&
+        e.changedTouches[0].pageX - this.startX <= -30
+      ) {
+        this.showDeleteButton(e);
+      } else if (
+        e.changedTouches[0].pageX > this.startX &&
+        e.changedTouches[0].pageX - this.startX < 30
+      ) {
+        this.showDeleteButton(e);
+      } else {
+        this.hideDeleteButton(e);
+      }
+    },
+    handleMovableChange(e) {
+      if (e.detail.source === 'friction') {
+        if (e.detail.x < -30) {
+          this.showDeleteButton(e);
+        } else {
+          this.hideDeleteButton(e);
+        }
+      } else if (e.detail.source === 'out-of-bounds' && e.detail.x === 0) {
+        this.hideDeleteButton(e);
+      }
+    },
+    handleDeleteClass(m,n) {//m:当前列的index、n:当前列的userId；
+      var self = this;
+      wx.showModal({
+        title: "删除",
+        content: "删除该团课课表",
+        success(res) {
+          if(res.confirm) {//点击确定；
+            var request = api.deleteCrmOperateLeague({
+              header: {
+                'content-type': 'application/json',
+                token: self.token
+              },
+              method: 'POST',
+              data: {
+                leagueId: n,
+                storeId: self.storeId
+              }
+            });
+            request.then(res => {
+              let result = res.data.body;
+              if(result.res == "true") {
+                wepy.showToast({
+                  title: result.msg,
+                  icon: "success",
+                  duration: 2000,
+                });
+                self.groupClassList.splice(m,1);//从列表去掉；
+                self.$apply();
+              } else {
+                wepy.showToast({
+                  title: result.msg,
+                  icon: "none",
+                  duration: 2000,
+                });
+              }
+            });
+            
+          };
+        },
+      });
+    }
+  };
+
+  /**
+   * 显示删除按钮
+   */
+  showDeleteButton(e) {
+    let productIndex = e.currentTarget.dataset.productindex;
+    this.setXmove(productIndex, -55);
+  }
+
+  /**
+   * 隐藏删除按钮
+   */
+  hideDeleteButton(e) {
+    let productIndex = e.currentTarget.dataset.productindex;
+
+    this.setXmove(productIndex, 0);
+  }
+
+  /**
+   * 设置movable-view位移
+   */
+  setXmove(productIndex, xmove) {
+    let productList = this.groupClassList;
+    productList[productIndex].xMove = xmove;
+    this.groupClassList = productList;
+  }
+  getGroupClassList() {
+    var request = api.getCrmOperateLeagueStore({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        storeId: this.storeId,
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      this.groupClassList = result;
+      this.groupClassList.forEach(function(v, i) {
+        //滑动位置初始化
+        v.xMove = 0;
+      });
+      this.$apply();
+    })
+  };
+  events = {};
+  onLoad() {
+
+    this.storeId = this.$parent.storeId;
+    this.token = this.$parent.token;
+    this.getGroupClassList();
+    
+  }
+}
+</script>

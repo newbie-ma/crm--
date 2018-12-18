@@ -1,0 +1,75 @@
+<style lang="less">
+.p-modular {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .p-box {
+    width: 566rpx;
+    height: 268rpx;
+    line-height: 268rpx;
+    text-align: center;
+    font-size: 60rpx;
+    color: #fff;
+    &.con1 {
+      background: #f55454;
+      margin-bottom: 200rpx;
+    }
+    &.con2 {
+      background: #5e5d5d;
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-modular">
+    <view class="p-box con1" @tap="jumpToSaleModular">销售模块</view>
+    <view class="p-box con2" @tap="jumpToBusinessModular">运营模块</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class Modular extends wepy.page {
+  config = {
+    navigationBarTitleText: '新模块'
+  };
+  components = {};
+
+  data = {
+    storeSort: 1
+  };
+
+  computed = {};
+
+  methods = {
+    jumpToSaleModular() {
+      wepy.navigateTo({
+        url: '../saleModular/index'
+      });
+    },
+    jumpToBusinessModular() {
+      if (this.storeSort == 1) {
+        wepy.navigateTo({
+          url: '../businessModular/groupIndex'
+        });
+      } else if (this.storeSort == 2) {
+        wepy.navigateTo({
+          url: '../businessModular/privateIndex'
+        });
+      }
+    }
+  };
+
+  events = {};
+
+  onLoad() {
+    let self = this;
+    self.storeSort = this.$parent.globalData.storeSort; //1健身房 2工作室
+  }
+}
+</script>

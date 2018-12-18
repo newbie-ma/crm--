@@ -1,0 +1,94 @@
+<style lang="less">
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+</style>
+
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/login/login',
+      'pages/businessModular/privateIndex', //工作室私教模块
+      'pages/businessModular/groupIndex', //健身房模块
+      'pages/staff/index',
+      'pages/staff/add',
+      'pages/staff/detail',
+      'pages/staff/edit',
+      'pages/boss/modular',
+      'pages/saleModular/index',
+      'pages/saleModular/add',
+      'pages/saleModular/detail',
+      'pages/saleModular/edit',
+      'pages/saleModular/customer',
+      'pages/businessModular/courseModular',
+      'pages/businessModular/coachAdd',
+      'pages/businessModular/coachDetail',
+      'pages/businessModular/coachEdit',
+      'pages/businessModular/groupTimeAdd',
+      'pages/businessModular/groupTimeDetail',
+      'pages/businessModular/groupTimeEdit',
+      'pages/businessModular/groupClassAdd',
+      'pages/businessModular/groupClassDetail',
+      'pages/businessModular/groupClassEdit'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    }
+  };
+
+  globalData = {
+    userInfo: null,
+    token: '', //有效依据
+    storeId: '', //健身房id
+    userType: 1, //用户类型1、老板，2、员工
+    storeSort: '', //1、健身房；2、私教课中心
+    userId: '' //销售员id
+  };
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+  }
+
+  onLaunch() {
+    var sessionid;
+    sessionid = wepy.getStorageSync('sessionid');
+    if (sessionid != '' && sessionid != undefined) {
+
+      this.globalData.storeId = sessionid.storeId;
+      this.globalData.userType = sessionid.userType;
+      this.globalData.token = sessionid.token;
+      this.globalData.userId = sessionid.userId;
+      this.globalData.storeSort = sessionid.storeSort;
+
+      if (sessionid.userType == 2) {
+        //员工
+        wepy.redirectTo({
+          url: './pages/staff/index'
+        });
+      } else if (sessionid.userType == 1) {
+        //老板
+        wepy.redirectTo({
+          url: './pages/boss/modular'
+        });
+      }
+    } else {
+      wepy.redirectTo({
+        url: './pages/login/login'
+      });
+    }
+  }
+}
+</script>

@@ -1,0 +1,307 @@
+<style lang="less">
+.p-private-detail {
+  position: relative;
+  height: 100vh;
+  padding: 0 40rpx;
+  .hide {
+    display: none;
+  }
+  .show {
+    display: block;
+  }
+  .p-section-1 {
+    display: flex;
+    padding-top: 56rpx;
+    align-items: center;
+    .left {
+      flex: 1;
+      .p-c {
+        margin-bottom: 20rpx;
+        display: flex;
+        align-items: center;
+        .p-label {
+          font-size: 32rpx;
+          color: #707070;
+          margin-right: 15rpx;
+        }
+        .p-c-value {
+          flex: 1;        
+          padding-left: 10rpx;
+        }
+      }
+      .p-c-1 {
+        .p-c-value {
+          font-size: 45rpx;
+          font-weight: bold;
+          padding-left: 0;
+        }
+      }
+      .p-c-2 {
+        & > view {
+          display: flex;
+          flex: 1;
+          align-items: center;
+        }
+        .p-age {
+          margin-left: 50rpx;
+        }
+      }
+      .p-c-3 {
+        position: relative;
+      }
+      .p-c-4 {
+        background: rgba(32, 4, 4, 0.1);
+        height: 40rpx;
+        line-height: 40rpx;
+        border-radius: 40rpx;
+        width: 270rpx;
+        view {
+          flex: 1;
+          font-size: 28rpx;
+          color: #707070;
+          text-align: center;
+          &.active {
+            background: #f64343;
+            border-radius: 40rpx;
+            color: #fff;
+          }
+        }
+      }
+    }
+    .right {
+      width: 198rpx;
+      height: 240rpx;
+      margin-left: 70rpx;
+      border-radius: 8rpx;
+      overflow: hidden;
+      image {
+        width: 198rpx;
+        height: 240rpx;
+      }
+
+    }
+  }
+  .p-section-2 {
+    position: relative;
+    margin-top: 44rpx;
+    .p-title {
+      font-size: 32rpx;
+      color: #707070;
+    }
+    .p-intro {
+      width: 100%;
+      height: 140rpx;
+      margin-top: 20rpx;
+      padding: 10rpx;
+      background: #ffffff;
+      border: 1px solid #363232;
+      cursor: text;
+      border-radius: 6rpx;
+      box-sizing: border-box;
+      font-size: 30rpx;
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    margin-top: 30rpx;
+    .p-title {
+        margin-bottom: 20rpx;
+      }
+    .p-c-intel {
+      display: flex;
+      flex-wrap: wrap;
+      view {
+        width: 140rpx;
+        height: 150rpx;
+        margin-right: 20rpx;
+        image {
+          width: 140rpx;
+          height: 150rpx;
+        }
+      }
+      
+    }
+  }
+  .p-section-4 {
+    margin-top: 40rpx;
+    .p-title {
+      margin-bottom: 24rpx;
+    }
+    .p-price-col {
+      display: flex;
+      align-items: center;
+      padding-left: 40rpx;
+      margin-bottom: 10rpx;
+      font-size: 32rpx;
+      color: #707070;
+      .p-label {
+        width: 120rpx;
+        margin-right: 20rpx;
+      }
+      .p-c-price {
+        width: 120rpx;
+        height: 45rpx;
+        line-height: 45rpx;
+        text-align: center;
+        border: 1px solid #707070;
+        margin-right: 20rpx;
+      }
+    }
+  }
+  .p-fixed {
+    // position: fixed;
+    // bottom: 70rpx;
+    // left: 0;
+    padding: 0 40rpx;
+    margin: 80rpx 0 60rpx;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    z-index: 9;
+    .p-btn {
+      width: 570rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      border-radius: 80rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      background: #f55454;
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-private-detail">
+    <view class="p-section-1">
+      <view class="left">
+        <view class="p-c p-c-1">
+          <view class="p-c-value">{{ coachData.coachName }}</view>
+        </view>
+        <view class="p-c p-c-2">
+          <view>
+            <view class="p-label">性别:</view>
+            <view class="p-c-value">{{ genderData[coachData.sex-1] }}</view>
+          </view>
+          <view>
+            <view class="p-label p-age">年龄:</view>
+            <view class="p-c-value">{{ coachData.age }}</view>
+          </view>
+        </view>
+        <view class="p-c p-c-3">
+          <view class="p-label">电话：</view>
+          <view class="p-c-value">1894569875</view>
+        </view>
+        <view class="p-c p-c-4">
+          <view :class="{active:coachData.bespeak == '1'}">可预约</view>
+          <view :class="{active:coachData.bespeak == '2'}">不可预约</view>
+        </view>
+      </view>
+      <view class="right"><image src="{{ coachData.coachImg }}" mode="aspectFill" /></view>
+    </view>
+    <view class="p-section-2">
+      <view class="p-title">个人介绍</view>
+      <view class="p-intro">{{ coachData.introduce }}</view>
+    </view>
+    <view class="p-section-3">
+      <view class="p-title">个人资质</view>
+      <view class="p-c-intel">
+        <view wx:for="{{coachIntel}}" wx:key="index">
+          <image src="{{item}}" mode="aspectFill" />
+        </view>
+      </view>
+    </view>
+    <view class="p-section-4 {{modularType=='1'?'show':'hide'}}">
+      <view class="p-title">价格设置</view>
+      <view class="p-price-col">
+        <view class="p-label">原价</view>
+        <view class="p-c-price">{{ priceData.price }}</view>
+        <view>元/课</view>
+      </view>
+      <view class="p-price-col">
+        <view class="p-label">团购价</view>
+        <view class="p-c-price">{{ priceData.twoPrice }}</view>
+        <view>元/2人</view>
+      </view>
+      <view class="p-price-col">
+        <view class="p-label"></view>
+        <view class="p-c-price">{{ priceData.threePrice }}</view>
+        <view>元/3人</view>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn" @tap="btnCoachEdit">编辑</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class privateDetail extends wepy.page {
+  config = {
+    navigationBarTitleText: '教练详情'
+  };
+  components = {};
+
+  data = {
+    coachId: "",
+    token: "",
+    genderData: ["男","女"],
+    coachData: [],//教练数据
+    priceData: [],//团课价格
+    coachIntel: [],//教练资质
+    modularType: "1",// 1私教课教练,2团课教练
+  };
+
+  computed = {};
+
+  methods = {
+    btnCoachEdit() {
+      wepy.navigateTo({
+        url: `coachEdit?coachId=${this.coachId}&modularType=${this.modularType}`,
+      });
+    }
+  };
+  getCoachDetail() {
+    var request = api.getCrmOperateCoach({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        coachId: this.coachId,
+      }
+    });
+    request.then(res => {
+      
+      let result = res.data.body;
+
+      this.coachData = result.crmOperateCoach;
+      this.priceData = result.crmOperateCoursePrice;
+
+      this.coachData.coachImg = `${api.BASE_URL}downloadCrm.do?ossId=${this.coachData.coachImg}`;
+
+      this.coachIntel = this.coachData.aptitude.split(",");
+      this.coachIntel.forEach((ele, index) => {
+        this.coachIntel[index] = `${api.BASE_URL}downloadCrm.do?ossId=${ele}`;
+      });
+      this.$apply();
+    })
+  };
+  onShow() {
+    this.getCoachDetail();
+  };
+  events = {};
+
+  onLoad(option) {
+    this.coachId = parseInt(option.coachId);
+    this.modularType = option.modularType;
+    this.token = this.$parent.globalData.token;
+    this.getCoachDetail();
+  }
+}
+</script>

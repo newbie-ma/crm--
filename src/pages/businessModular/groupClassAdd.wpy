@@ -1,0 +1,375 @@
+<style lang="less">
+.p-groupclass-add {
+  position: relative;
+  // height: 100vh;
+  padding: 0 40rpx;
+  .p-header {
+    display: flex;
+    align-items: center;
+    margin: 60rpx 0 45rpx;
+    view {
+      font-size: 40rpx;
+      color: #0a0101;
+      font-weight: 600;
+    }
+    input {
+      flex: 1;
+      padding: 10rpx 15rpx;
+      border-bottom: 1rpx solid #707070;
+    }
+  }
+  .p-bespeak {
+    display: flex;
+    align-items: center;
+    margin-bottom: 45rpx;
+    view {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+      font-weight: 600;
+    }
+    input {
+      width: 100rpx;
+      padding: 10rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #f55454;
+      border-bottom: 1rpx solid #707070;
+    }
+  }
+
+  .p-section {
+    margin-top: 45rpx;
+    margin-bottom: 45rpx;
+    .p-title {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+      margin-bottom: 24rpx;
+    }
+  }
+  .p-section-1 {
+    display: flex;
+    align-items: center;
+    .p-title {
+      font-size: 36rpx;
+      color: rgba(10, 1, 1, 0.6);
+    }
+    .p-class-time {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #f55454;
+      margin-left: 20rpx;
+      picker {
+        font-size: 60rpx;
+        border-bottom: 1rpx solid #eee;
+      }
+      view {
+        margin: 0 15rpx;
+      }
+    }
+  }
+  .p-section-2 {
+    textarea {
+      border: 1rpx solid #707070;
+      padding: 10rpx;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 32rpx;
+      border-radius: 8rpx;
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    .p-class-show {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      view {
+        width: 260rpx;
+        height: 215rpx;
+        margin-bottom: 20rpx;
+        image {
+          width: 260rpx;
+          height: 215rpx;
+        }
+      }
+      .p-upload {
+        position: relative;
+        background: #8F8D8D;
+        &:after,
+        &:before {
+          display: block;
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          background: #FFF;
+          transform: translate(-50%,-50%);
+        }
+        &:after {
+          width: 45rpx;
+          height: 6rpx;
+        }
+        &:before {
+          width: 6rpx;
+          height: 45rpx;
+        }
+      }
+    }
+  }
+  .p-fixed {
+    // position: fixed;
+    // width: 100%;
+    // bottom: 70rpx;
+    // left: 0;
+    // padding: 0 40rpx;
+    margin: 40rpx 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    z-index: 9;
+    .p-btn {
+      width: 262rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 70rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-groupclass-add">
+    <view class="p-header">
+      <view>团课名称：</view>
+      <input type="text" value="{{classNameVal}}" @input="handleClassName" />
+    </view>
+    <view class="p-bespeak">
+      <view>可预约人数：</view>
+      <input type="text" value="{{peopleNumber}}" @input="handleBespeak" />
+    </view>
+    <view class="p-section-1">
+      <view class="p-title">上课时间：</view>
+      <view class="p-class-time">
+        <picker value="{{startTime}}" mode="time" @change="bindStartTime">{{startTime}}</picker>
+        <view>-</view>
+        <picker value="{{endTime}}" mode="time" @change="bindEndTime">{{endTime}}</picker>
+      </view>
+    </view>
+    <view class="p-section p-section-2">
+      <view class="p-title">课程介绍：</view>
+      <view class="p-class-explain">
+        <textarea value="{{areaVal}}" @input="handleArea" maxlength="-1"></textarea>
+      </view>
+    </view>
+    <view class="p-section p-section-3">
+      <view class="p-title">课程展示：</view>
+      <view class="p-class-show">
+        <view wx:for="{{ imgShowData }}" wx:key="{{index}}" @tap="handleDeleteShow({{index}})">
+          <image src="{{ BASEURL+'downloadCrm.do?ossId='+item }}" mode="aspectFill"/>
+        </view>
+        <view class="p-upload" @tap="classShow"></view>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+const regNumber = /^[0-9]*$/;
+export default class groupClassAdd extends wepy.page {
+  config = {
+    navigationBarTitleText: '添加团课名称'
+  };
+  components = {};
+
+  data = {
+    BASEURL: "",//请求基础地址
+    storeId: "",
+    peopleNumber: "",
+    token: "",
+    classNameVal: "",
+    startTime: '08:00',
+    endTime: '10:00',
+    areaVal: "",   
+    imgShowData: []
+  };
+
+  computed = {};
+
+  methods = {
+    handleClassName(e) {
+      this.classNameVal = e.detail.value;
+    },
+    handleBespeak(e) {
+      this.peopleNumber = parseInt(e.detail.value);
+    },
+    bindStartTime(e) {
+      this.startTime = e.detail.value;
+    },
+    bindEndTime(e) {
+      this.endTime = e.detail.value;
+    },
+    handleArea(e) {
+      this.areaVal = e.detail.value;
+    },
+    classShow() {//课程展示上传图片
+      this.upLoad().then(res => {
+        this.imgShowData.push(res);
+        this.$apply();
+      })
+    },
+    handleDeleteShow(m) {
+      var self = this;
+      wx.showModal({
+        title: "删除",
+        content: "删除该条课程展示",
+        success(res) {
+          if(res.confirm) {
+            self.coachIntel.splice(m,1);
+            self.$apply();
+          }
+        },
+      })
+    },
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      });
+    },
+    btnSure() {
+      if( this.checkVal() ) {
+        this.newClassAdd();
+      }
+    }
+  };
+  checkVal() {
+    if (this.classNameVal == '') {
+      wepy.showToast({
+        title: '请输入姓名',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.peopleNumber == '') {
+      wepy.showToast({
+        title: '请输入可预约人数',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.areaVal == '') {
+      wepy.showToast({
+        title: '请输入课程介绍',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.imgShowData.length == 0) {
+      wepy.showToast({
+        title: '请上传课程展示图片',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (!regNumber.test(this.peopleNumber)) {
+      wepy.showToast({
+        title: '预约人数必须为数字',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else {
+      return true;
+    }
+  };
+  upLoad() {//执行上传功能，根据需要返回相应的参数
+    return new Promise(function(resolve, reject){
+      wx.chooseImage({
+        count: 1,
+        sizeType: ['original', 'compressed'],
+        sourceType: ['album', 'camera'],
+        success (res){
+          // tempFilePath可以作为img标签的src属性显示图片    
+          let tempFilePaths = res.tempFilePaths;
+          wx.uploadFile({
+            url: `${api.BASE_URL}uploadCrm.do`, //上传地址
+            filePath: tempFilePaths[0],
+            name: "file", 
+            success(res){
+              if(res.statusCode == 200) {
+                let result = JSON.parse(res.data);//data为对象字符串
+                let ossId = result.body;
+                resolve(ossId);
+              }
+            }
+          })
+        }
+      });
+    });    
+  };
+  newClassAdd() {
+
+    // var showImg = this.imgShowData.toString();//两者都可
+    var showImg = this.imgShowData.join(",") + ",";
+    
+    var data = {
+      leagueName: this.classNameVal,
+      peopleNumber: this.peopleNumber,
+      startTime: "2018-01-01 " + this.startTime + ":00",
+      endTime: "2018-01-01 " + this.endTime + ":00",
+      content: this.areaVal,
+      showImg: showImg,
+      storeId: this.storeId
+    };
+    var request = api.saveCrmOperateLeague({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: data
+    });
+    request.then(res => {
+      let result = res.data.body;
+      if(result.res == "true") {
+        wepy.showToast({
+          title: result.msg,
+          icon: "success",
+          duration: 2000,
+        });
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1
+          })
+        }, 2000);
+      } else {
+        wepy.showToast({
+          title: result.msg,
+          icon: "none",
+          duration: 2000,
+        });
+      }
+    })  
+  }
+  events = {};
+
+  onLoad() {
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.BASEURL = api.BASE_URL;
+  }
+}
+</script>

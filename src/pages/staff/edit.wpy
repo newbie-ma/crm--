@@ -1,0 +1,622 @@
+<style lang="less">
+.p-staff-edit {
+  position: relative;
+  padding-bottom: 150rpx;
+  .hide {
+    display: none!important;
+  }
+  .show {
+    display: block!important;
+  }
+  .p-section-1 {
+    display: flex;
+    align-items: center;
+    padding-top: 80rpx;
+    .left {
+      flex: 1;
+      padding-left: 40rpx;
+      .p-c {
+        margin-bottom: 10rpx;
+        display: flex;
+        align-items: center;
+        span {
+          color: #707070;
+        }
+      }
+      .p-c-1 {
+        span {
+          font-size: 58rpx;
+        }
+        input {
+          width: 180rpx;
+          font-size: 50rpx;
+          padding: 10rpx 0;
+          border-bottom: 1rpx solid #707070;
+        }
+      }
+      .p-c-2 {
+        span {
+          font-size: 32rpx;
+        }
+        .p-age {
+          margin-left: 30rpx;
+        }
+        i {
+          border: 1rpx solid rgba(112, 112, 122, 0.2);
+          color: rgba(112, 112, 122, 0.2);
+          // opacity: 0.2;
+          margin-left: 20rpx;
+          display: inline-block;
+          font-size: 30rpx;
+          width: 40rpx;
+          height: 40rpx;
+          text-align: center;
+          line-height: 40rpx;
+          &.active {
+            border: 1rpx solid #f55454;
+            color: #f55454;
+          }
+        }
+        input {
+          flex: 1;
+          font-size: 30rpx;
+          text-align: center;
+          border-bottom: 1rpx solid #707070;
+        }
+      }
+      .p-c-3 {
+        span {
+          font-size: 32rpx;
+          color: #707070;
+        }
+        input {
+          flex: 1;
+          font-size: 32rpx;
+          padding-left: 10rpx;
+          border-bottom: 1rpx solid #707070;
+        }
+      }
+    }
+    .right {
+      width: 300rpx;
+      display: flex;
+      margin-left: 50rpx;
+      .p-k-wrap {
+        width: 196rpx;
+        .p-k-tr {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .p-k-con {
+          width: 98rpx;
+          height: 98rpx;
+          line-height: 99rpx;
+          border-radius: 15rpx;
+          background: #f8f8f8;
+          color: rgba(112, 112, 112, 0.2);
+          font-size: 80rpx;
+          text-align: center;
+          &.active {
+            background: #f55454;
+            color: #fff;
+          }
+        }
+      }
+      .p-k-tip {
+        flex: 1;
+        height: 196rpx;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: #aba9a9;
+        color: #fff;
+        border-radius: 15rpx 0 0 15rpx;
+        font-weight: bold;
+        font-size: 57rpx;
+        flex-direction: column;
+        padding-left: 20rpx;
+        box-sizing: border-box;
+      }
+    }
+  }
+  .p-section-2 {
+    margin: 40rpx;
+    .p-s-top {
+      font-size: 33rpx;
+      color: #707070;
+      margin-bottom: 45rpx;
+      .p-h1 {
+        font-size: 33rpx;
+        font-weight: bold;
+      }
+      .flex-wrap {
+        display: flex;
+        justify-content: space-between;
+        font-size: 30rpx;
+        margin-top: 25rpx;
+      }
+    }
+    .p-visit-title {
+      font-size: 34rpx;
+      color: #707070;
+      font-weight: bold;
+      margin-bottom: 22rpx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .v-add {
+        color: #f55454;
+        font-size: 66rpx;
+      }
+    }
+    .p-visit-wrap {
+      border: 1rpx solid #707070;
+      padding: 10rpx;
+      margin-bottom: 20rpx;
+      .p-s-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .p-s-time {
+          font-size: 30rpx;
+          color: #707070;
+          view {
+            display: flex;
+            align-items: center;
+          }
+          picker {
+            border-bottom: 1rpx solid #707070;
+          }
+        }
+        .b-edit {
+          font-size: 28rpx;
+          color: #f55454;
+          .p-btn-list {
+            display: flex;
+            font-size: 40rpx;
+            view {
+              margin-right:20rpx
+            }
+          }
+        }
+      }
+    }
+
+    .p-s-con {
+      width: 100%;
+      min-height: 200rpx;
+      margin-top: 10rpx;
+      border: 1rpx solid #707070;
+      padding: 20rpx 14rpx;
+      border-radius: 8rpx;
+      box-sizing: border-box;
+      color: #190F0F;
+      font-size: 30rpx;
+      font-weight: bold;
+    }
+  }
+  .p-fixed {
+    position: fixed;
+    bottom: 0rpx;
+    left: 0;
+    padding: 0 40rpx;
+    width: 100%;
+    height: 150rpx;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFF;
+    z-index: 9;
+    .p-btn {
+      width: 262rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 74rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-staff-edit">
+    <view class="p-section-1">
+      <view class="left">
+        <view class="p-c p-c-1"><input type="text" value="{{nameVal}}" @input="nameFun"/></view>
+        <view class="p-c p-c-2">
+          <span>性别:</span><i :class="{active: gender == 1}" @tap="sex(1)">男</i><i :class="{active: gender == 2}" @tap="sex(2)">女</i>
+          <span class="p-age">年龄:</span><input value="{{ageVal}}" @input="ageFun" />
+        </view>
+        <view class="p-c p-c-3"><span>电话：</span><input type="text" value="{{mobileVal}}" @input="mobileFun" /></view>
+      </view>
+      <view class="right">
+        <view class="p-k-wrap">
+          <view class="p-k-tr">
+            <view class="p-k-con" :class="{active:kindNumber == 1}" @tap="selectedKind(1)">1</view>
+            <view class="p-k-con" :class="{active:kindNumber == 2}" @tap="selectedKind(2)">2</view>
+          </view>
+          <view class="p-k-tr">
+            <view class="p-k-con" :class="{active:kindNumber == 3}" @tap="selectedKind(3)">3</view>
+            <view class="p-k-con" :class="{active:kindNumber == 4}" @tap="selectedKind(4)">4</view>
+          </view>      
+        </view>
+        <view class="p-k-tip"><view>类</view><view>别</view></view>
+      </view>
+    </view>
+    <view class="p-section-2">
+      <view class="p-s-top {{yearCard?'show':'hide'}}" >
+        <view class="p-h1">年卡时间</view>
+        <view class="flex-wrap">
+          <view>办理时间：2018.11.15</view>
+          <view>到期时间：2019.11.14</view>
+        </view>
+      </view> 
+      <view class="p-visit-title">
+        <view>回访记录</view>
+        <view class="v-add" @tap="addVisit">+</view>
+      </view>
+      <view class="p-visit-wrap" wx:for="{{ visitList }}" wx:key="{{ index }}">
+        <view class="p-s-header">
+          <view class="p-s-time {{item.vShow?'show':'hide'}}">时间：{{ item.contactTime }}</view>
+          <view class="p-s-time {{!item.vShow?'show':'hide'}}">
+            <view>时间：<picker mode="date" value="{{item.contactTime}}" data-pickerid="{{ index }}" @change="pickerFun">{{ modVisitList[index].contactTime }}</picker></view>
+          </view>
+          <view class="b-edit">
+            <view class="{{item.eStatus?'show':'hide'}}" @tap="editStart({{index}})">编辑</view>
+            <view class="{{!item.eStatus?'show':'hide'}}" >
+              <view class="p-btn-list">
+                <view @tap="editSure({{index}})">√</view>
+                <view @tap="editCancle({{index}})">×</view>
+              </view>
+            </view>
+          </view>
+        </view>  
+        <view class="p-s-con {{item.vShow?'show':'hide'}}">{{ item.remarks }}</view>
+        <textarea class="p-s-con {{!item.vShow?'show':'hide'}}" value="{{ modVisitList[index].remarks }}" data-txtid="{{ index }}" @input="areaFun" ></textarea>
+      </view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>  
+</template>
+
+<script>
+import wepy from 'wepy';
+import dateTime from '@/utils/date.js';
+import api from '@/api/api.js';
+const regPhone = /^[1][3,4,5,7,8][0-9]{9}$/;
+const regNumber = /^[0-9]*$/;
+export default class staffEdit extends wepy.page {
+  config = {
+    navigationBarTitleText: '编辑详情'
+  };
+  components = {};
+
+  data = {
+    currentTime: "",
+    nameVal: "",
+    ageVal: "",
+    mobileVal: "",
+    visitVal: "2018-12-05",
+    clientId: "",
+    storeId: "",
+    token: "",
+    yearCard: [],
+    customerData: {},
+    visitList: [],
+    gender: 1,
+    kindNumber: 1,
+    editStatusList: [],
+    modVisitList: [],
+  };
+
+  computed = {};
+
+  methods = {
+    sex(index) {
+      this.gender = parseInt(index);
+    },
+    selectedKind(m) {
+      this.kindNumber = parseInt(m);
+    },
+    nameFun(e) {
+      this.nameVal = e.detail.value;
+    },
+    ageFun(e) {
+      this.ageVal = e.detail.value;
+      if(this.ageVal!="") {
+        this.ageVal = parseInt(this.ageVal);
+      }
+      
+    },
+    mobileFun(e) {
+      this.mobileVal = e.detail.value;
+    },
+    pickerFun(e) {
+      console.log(e);
+      let index = e.currentTarget.dataset.pickerid;
+      this.modVisitList[index].contactTime = e.detail.value;
+      this.$apply();
+      // this.visitTime = e.detail.value;
+    },
+    areaFun(e) {
+      console.log(e);
+      let index = e.currentTarget.dataset.txtid;
+      this.modVisitList[index].remarks = e.detail.value;
+      console.log(this.visitList);
+      this.$apply();
+      // this.areaVal = e.detail.value;
+    },
+    addVisit() {//添加回访记录
+      let newVisitData = {
+        "remarks": "", 
+        "contactTime": this.currentTime,
+        "eStatus": true,
+        "vShow": true,
+        "contactId": "",
+      };
+      let modVisit = {
+        "remarks": "", 
+        "contactTime": this.currentTime,
+      };
+      //切记不能push同一个数对象
+      this.visitList.push(newVisitData);
+      this.modVisitList.push(modVisit);
+      this.$apply();
+      console.log(this.visitList);
+    },
+    editStart(m) {//回访编辑
+      console.log(m);
+      this.visitList.forEach((ele,index) => {
+        if(index == m) {
+          ele.eStatus = false;
+          ele.vShow = false;
+        } else {//当前只能编辑一条回访记录
+          ele.eStatus = true;
+          ele.vShow = true;
+        }
+      });
+      this.$apply();
+    },
+    editCancle(m) {//取消回访编辑
+      console.log(this.visitList);
+      this.visitList.forEach((ele,index) => {
+        if(index == m) {//改变当前的编辑状态
+          ele.eStatus = true;
+          ele.vShow = true;
+          //取消时，回访时间和回访记录初始化
+          this.modVisitList[index].contactTime = ele.contactTime;
+          this.modVisitList[index].remarks = ele.remarks;
+          this.$apply();
+        };
+      });
+    },
+    editSure(m) {//回访编辑完成
+      console.log(this.visitList[m].contactId);
+      let contactId = this.visitList[m].contactId;
+      if(contactId != "") {
+        //修改回访记录
+        var request = api.updateCrmClientContact({
+          header: {
+            'content-type': 'application/json',
+            token: this.token
+          },
+          method: 'POST',
+          data: {
+            remarks: this.modVisitList[m].remarks,
+            contactTime: this.modVisitList[m].contactTime + " 00:00:00",
+            contactId: parseInt(contactId),
+          }
+        });
+        request.then(res => {
+          console.log(res);
+          var result = res.data.body;
+          if(result.res == "true") {
+            //修改回访记录成功后，更新list
+            this.visitList[m].remarks = this.modVisitList[m].remarks;
+            this.visitList[m].contactTime = this.modVisitList[m].contactTime;
+            wepy.showToast({
+              title: result.msg,
+              icon: "success",
+              duration: 2000,
+            });
+            this.$apply();
+          } else {
+            wepy.showToast({
+              title: result.msg,
+              icon: "success",
+              duration: 2000,
+            });
+            return false;
+          }
+        });
+      } else {
+        //新增回访记录
+        var request = api.saveCrmClientContact({
+          header: {
+            'content-type': 'application/json',
+            token: this.token
+          },
+          method: 'POST',
+          data: {
+            clientId: parseInt(this.clientId),
+            remarks: this.modVisitList[m].remarks,
+            contactTime: this.modVisitList[m].contactTime + " 00:00:00",
+          }
+        });
+        request.then( res=> {
+          var result = res.data.body;
+          if(result.res == "true") {
+            //添加回访记录成功后，更新list
+            this.visitList[m].remarks = this.modVisitList[m].remarks;
+            this.visitList[m].contactTime = this.modVisitList[m].contactTime;
+            wepy.showToast({
+              title: result.msg,
+              icon: "success",
+              duration: 2000,
+            });
+            this.$apply();
+          } else {
+            wepy.showToast({
+              title: result.msg,
+              icon: "success",
+              duration: 2000,
+            });
+            return false;
+          }
+        }); 
+      };
+      this.visitList.forEach((ele,index) => {
+        if(index == m) {
+          ele.eStatus = true;
+          ele.vShow = true;
+        }
+      });
+      this.$apply();
+    },
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      });
+    },
+    btnSure() {
+      if (this.checkVal()) {
+        var request = api.updateCrmClient({
+          header: {
+            'content-type': 'application/json',
+            token: this.token
+          },
+          method: 'POST',
+          data: {
+            name: this.nameVal,
+            age: this.ageVal,
+            sex: this.gender,
+            mobile: this.mobileVal,
+            typeId: this.kindNumber,
+            storeId: this.storeId,
+            clientId: this.clientId
+          }
+        });
+        request.then(res => {
+          console.log(res);
+          let result = res.data.body;
+          if(result.res == "true") {
+            wepy.showToast({
+              title: result.msg,
+              icon: "success",
+              duration: 2000,
+            });
+            setTimeout(() => {
+              wepy.navigateBack({
+                delta: 1
+              })
+            }, 2000);
+            
+          } else {
+            wepy.showToast({
+              title: result.msg,
+              icon: "none",
+              duration: 2000,
+            });
+          }
+        });
+      }
+    }
+  };
+  checkVal() {
+    if (this.nameVal == '') {
+      wepy.showToast({
+        title: '请输入姓名',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.ageVal == '') {
+      wepy.showToast({
+        title: '请输入年龄',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (this.mobileVal == '') {
+      wepy.showToast({
+        title: '请输入手机号码',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (!regNumber.test(this.ageVal)) {
+      wepy.showToast({
+        title: '年龄必须为数字',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else if (!regPhone.test(this.mobileVal)) {
+      wepy.showToast({
+        title: '请输入正确的手机号',
+        icon: 'none',
+        duration: 2000
+      });
+      return false;
+    } else {
+      return true;
+    }
+  }
+  events = {};
+
+  onLoad(option) {
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.clientId = option.clientId;
+    this.currentTime = dateTime.formatTime(new Date());
+    var request = api.getCrmClient({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        clientId: parseInt(this.clientId),
+        storeId: parseInt(this.storeId)
+      }
+    });
+    request.then(res => {
+      console.log(res);
+      let result = res.data.body;
+      this.yearCard = result.crmCard;
+      this.customerData = result.crmClient;
+      this.visitList = result.crmClientContacts;
+      this.nameVal = this.customerData.name;
+      this.ageVal = this.customerData.age;
+      this.mobileVal = this.customerData.mobile;
+      this.gender = this.customerData.sex;
+      this.kindNumber = this.customerData.typeId;
+      console.log(this.visitList);
+      var self = this;
+      this.visitList.forEach((ele,index) => {
+         ele.eStatus = true;
+         ele.vShow = true;
+         let newVisit = {
+           contactTime: "",
+           remarks: "",
+         };
+         newVisit.contactTime = ele.contactTime;
+         newVisit.remarks = ele.remarks;
+         self.modVisitList.push(newVisit);
+      });
+    })
+
+  }
+}
+</script>

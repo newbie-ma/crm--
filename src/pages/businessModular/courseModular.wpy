@@ -1,0 +1,247 @@
+<style lang="less">
+.p-course-modular {
+  position: relative;
+  height: 100vh;
+  padding: 60rpx 40rpx;
+  .hide {
+    display: none;
+  }
+  .show {
+    display: block;
+  }
+  .p-pagename {
+    font-size: 56rpx;
+    color: #0a0101;
+  }
+  .p-section-1 {
+    position: relative;
+    margin: 30rpx 0;
+    p-title {
+      font-size: 40rpx;
+      color: #271818;
+    }
+    .p-con {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #F55454;
+      margin: 30rpx 0;
+    }
+    picker {
+      font-size: 60rpx;
+      margin: 0 20rpx; 
+    }
+  }
+  .p-section-2 {
+    position: relative;
+    margin: 30rpx 0;
+    p-title {
+      font-size: 40rpx;
+      color: #271818;
+    }
+    .p-con {
+      display: flex;
+      align-items: center;
+      margin: 30rpx 0;
+      view {
+        width: 142rpx;
+        height: 50rpx;
+        line-height: 50rpx;
+        background: #707070;
+        font-size: 32rpx;
+        margin-right: 20rpx;
+        text-align: center;
+        border-radius: 9rpx;
+        color: #FFF;
+        &.active {
+          background: #F55454;
+        }
+      }
+    }
+  }
+  .p-section-3 {
+    position: relative;
+    margin-top: 110rpx;
+    display: flex;
+    align-items: center;
+    view {
+      margin-right: 20rpx;
+      font-size: 34rpx;
+      color: #271818;
+    }
+    .p-title {
+      font-size: 40rpx;
+      color: rgba(39,24,24,0.5);
+      font-weight: bold;
+    }
+    input {
+      width: 120rpx;
+      border: 1px solid #707070;
+      text-align: center;
+    }
+  }
+  .p-fixed {
+    position: fixed;
+    bottom: 70rpx;
+    left: 0;
+    padding: 0 40rpx;
+    margin: 40rpx 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    z-index: 9;
+    .p-btn {
+      width: 262rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      border-radius: 74rpx;
+      text-align: center;
+      font-size: 40rpx;
+      color: #fff;
+      &.cancle {
+        background: rgba(23, 4, 4, 0.3);
+      }
+      &.sure {
+        background: #f55454;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-course-modular">
+    <view class="p-pagename">课程模块</view>
+    <view class="p-section-1">
+      <view class="p-title">可预约时间</view>
+      <view class="p-con">
+        <picker value="{{startTime}}" mode="time" @change="bindStartTime">{{startTime}}</picker>
+        <view>-</view>
+        <picker value="{{endTime}}" mode="time" @change="bindEndTime">{{endTime}}</picker>
+      </view>
+    </view>
+    <view class="p-section-2">
+      <view class="p-title">可预约人数</view>
+      <view class="p-con">
+        <view :class="{active: peopleNumber == 1}" @tap="handleOrderPeople(1)">1人</view>
+        <view :class="{active: peopleNumber == 2}" @tap="handleOrderPeople(2)">2人</view>
+        <view :class="{active: peopleNumber == 3}" @tap="handleOrderPeople(3)">3人</view>
+      </view>
+    </view>
+    <view class="p-section-3">
+      <view class="p-title">体验价</view>
+      <view><input type="number" value="{{ experiencePrice }}" @input="handleExperiencePrice" /></view>
+      <view>元/课</view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn cancle" @tap="btnCancle">取消</view>
+      <view class="p-btn sure" @tap="btnSure">确定</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class courseModular extends wepy.page {
+  config = {
+    navigationBarTitleText: '私教课程模块'
+  };
+  components = {};
+
+  data = {
+    storeId: "",
+    token: "",
+    startTime: '08:30',
+    endTime: '12:30',
+    peopleNumber: 1,
+    experiencePrice: 400.00,
+  };
+
+  computed = {};
+
+  methods = {
+    btnCancle() {
+      wepy.navigateBack({
+        delta: 1
+      })
+    },
+    btnSure() {
+      this.updateCourseData();
+    },
+    bindStartTime(e) {
+      this.startTime = e.detail.value;
+    },
+    bindEndTime(e) {
+      this.endTime = e.detail.value;
+    },
+    handleOrderPeople(m) {
+      this.peopleNumber = parseInt(m);
+    },
+    handleExperiencePrice(e) {
+      this.experiencePrice = Number(e.detail.value);
+    }
+  };
+  getCourseData() {//查看课程信息
+    var request = api.getCrmOperateCourse({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        storeId: this.storeId
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      if(result != "" && result != null) {
+        this.startTime = result.startTime;
+        this.endTime = result.endTime;
+        this.experiencePrice = Number(result.experiencePrice);
+        this.peopleNumber = result.peopleNumber;
+      }
+    });
+  };
+  updateCourseData() {//编辑课程信息
+    var request = api.updateCrmOperateCourse({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        peopleNumber: this.peopleNumber,
+        startTime: this.startTime + ":00",
+        endTime: this.endTime + ":00",
+        experiencePrice: (this.experiencePrice).toFixed(2),
+        storeId: this.storeId,
+      }
+    });
+    request.then(res => {
+      let result = res.data.body;
+      if(result.res == "true") {
+        wepy.showToast({
+          title: result.msg,
+          icon: "success",
+          duration: 2000,
+        });
+        setTimeout(() => {
+          wepy.navigateBack({
+            delta: 1
+          })
+        }, 2000);
+      }
+      this.$apply();
+    });
+  }
+  events = {};
+
+  onLoad() {
+    this.storeId = this.$parent.globalData.storeId;
+    this.token = this.$parent.globalData.token;
+    this.getCourseData();
+  }
+}
+</script>

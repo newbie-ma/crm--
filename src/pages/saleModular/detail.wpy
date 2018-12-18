@@ -1,0 +1,133 @@
+<style lang="less">
+.p-boss-detail {
+  position: relative;
+  padding: 0 50rpx;
+  .p-section-1 {
+    position: relative;
+    margin: 80rpx 0;
+    .p-name {
+      font-size: 57rpx;
+      color: #0A0101;
+      font-weight: 600;
+    }
+  }
+  .p-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 30rpx 0;
+    color: #707070;
+    font-size: 32rpx;
+    font-weight: bold;
+    border-bottom:1rpx solid #707070;
+    padding:15rpx 0;
+
+    span {
+      padding-right: 20rpx;
+    }
+  }
+  .p-fixed {
+    width: 100%;
+    margin-top: 200rpx;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 9;
+    .p-btn {
+      width: 300rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      border-radius: 80rpx;
+      text-align: center;
+      font-size: 36rpx;
+      color: #fff;
+      background: #f55454;
+    }
+  }
+}
+</style>
+<template>
+  <view class="p-boss-detail">
+    <view class="p-section-1">
+      <view class="p-name">{{saleManData.name}}</view>
+    </view>
+    
+    <view class="p-info">
+      <view class="p-left"><span>年龄：</span>{{ saleManData.age }}</view>
+      <view class="p-right"><span>性别</span>{{genderData[saleManData.sex-1]}}</view>
+    </view>
+    <view class="p-info">
+      <view class="p-left">入职时间</view>
+      <view class="p-right">{{ saleManData.entryTime }}</view>
+    </view>
+    <view class="p-info">
+      <view class="p-left"><span>电话：</span>{{ saleManData.mobile }}</view>
+    </view>
+    <view class="p-fixed">
+      <view class="p-btn" @tap="btnCheckUser">产看用户列表</view>
+      <view class="p-btn" @tap="saleEdit">编辑销售员</view>
+    </view>
+  </view>  
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api.js';
+
+export default class saleModularDetail extends wepy.page {
+  config = {
+    navigationBarTitleText: '销售员详情'
+  };
+  components = {};
+
+  data = {
+    salemanid: "",
+    saleManData: {},
+    genderData: ["男","女"],
+  };
+
+  computed = {};
+
+  methods = {
+    btnCheckUser() {//查看销售员名下的用户列表
+      wepy.navigateTo({
+        url: `customer?userId=${this.salemanid}`,
+      });
+    },
+    saleEdit() {
+      wepy.navigateTo({
+        url: `edit?salemanid=${this.salemanid}`,
+      });
+    }
+  };
+  getSaleManDetail() {
+    var request = api.getCrmUser({
+      header: {
+        'content-type': 'application/json',
+        token: this.token
+      },
+      method: 'POST',
+      data: {
+        userId: this.salemanid,
+      }
+    });
+    request.then(res => {
+      console.log(res);
+      let result = res.data.body;
+      this.saleManData = result;
+      this.$apply();
+    });
+  };
+  onShow() {
+    this.getSaleManDetail();
+  };
+  events = {};
+
+  onLoad(option) {
+    let self = this;
+    console.log(option.salemanid);
+    this.salemanid = parseInt(option.salemanid);
+    this.getSaleManDetail();
+  }
+}
+</script>
