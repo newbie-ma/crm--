@@ -5,3 +5,27 @@
 #  npm run dev 运行项目
 #  编译 wepy 项目用微信web开发者工具打开项目 
 #  
+README
+  
+README
+  
+README  
+README  
+README
+  
+README  
+README  
+README  
+README
+  
+README  
+README  
+README  
+README  
+README
+
+  
+README  
+README  
+README  
+README
